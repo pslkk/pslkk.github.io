@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Wheel of Life: A PSLKK Journey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f0f0f0;
+      transition: background 0.6s cubic-bezier(.77,0,.18,1);
+    }
+    body.spinning, body.show-content { overflow: hidden; }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      transition: filter 0.5s;
+    }
+    .wheel-blocked { pointer-events: none; }
+    .wheel-wrapper {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      margin-bottom: 30px;
+      transition: opacity 0.5s;
+    }
+    .wheel-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      position: relative;
+      user-select: none;
+      pointer-events: none;
+    }
+    .sector-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 3;
+      pointer-events: all;
+    }
+    .sector-overlay-svg {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0; left: 0;
+      pointer-events: all;
+    }
+    .sector-area {
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: all;
+    }
+    .sector-area:hover {
+      opacity: 0.12;
+    }
+    .spin-btn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      width: 90px;
+      height: 90px;
+      background: #fff;
+      border: 4px solid #222;
+      border-radius: 50%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #222;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      user-select: none;
+    }
+    .spin-btn:active {
+      background: #f7f7f7;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    .spin-btn:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .needle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 12px;
+      height: 70px;
+      transform: translate(-50%, -100%) rotate(0deg);
+      transform-origin: 50% 100%;
+      transition: transform 3.2s cubic-bezier(.22,1.12,.58,1);
+      z-index: 5;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .needle-shape {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 32px solid #333;
+      margin-bottom: 2px;
+    }
+    .needle-base {
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border: 3px solid #222;
+      border-radius: 50%;
+      margin-top: -8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .content-overlay {
+      position: fixed;
+      left: 0; top: 0; right: 0; bottom: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .content-overlay.active {
+      pointer-events: all;
+      opacity: 1;
+      animation: slideDown 0.7s cubic-bezier(.77,0,.18,1);
+    }
+    @keyframes slideDown {
+      0% { transform: translateY(-80px); opacity: 0;}
+      100% { transform: translateY(0); opacity: 1;}
+    }
+    .content-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.14);
+      padding: 36px 44px;
+      min-width: 270px;
+      max-width: 90vw;
+      text-align: center;
+      animation: contentPop 0.7s cubic-bezier(.77, 0, .18, 1);
+    }
+    @keyframes contentPop {
+      0% { transform: scale(0.85); opacity: 0;}
+      100% { transform: scale(1); opacity: 1;}
+    }
+    .content-title {
+      font-size: 2.1rem;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+    .content-desc {
+      font-size: 1.15rem;
+      color: #444;
+      line-height: 1.5;
+    }
+    .home-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 120;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
+      line-height: 1;
+    }
+    .home-btn.active {
+      opacity: 1;
+      pointer-events: all;
+      animation: popHome 0.4s;
+    }
+    @keyframes popHome {
+      0% { transform: scale(0.6);}
+      100% { transform: scale(1);}
+    }
+    .hello-message {
+      position: absolute;
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5rem;
+      color: black;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
+    .dialogue-box {
+      position: fixed;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    .dialogue-box p {
+      margin: 0;
+      text-align: center;
+      font-size: 1rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainContainer">
+    <div class="hello-message">Welcome! I'm P.S.L. Krishna Kanth</div>
+    <div class="wheel-wrapper" id="wheelWrapper">
+      <svg class="wheel-svg" id="wheelSVG" viewBox="0 0 400 400"></svg>
+      <div class="sector-overlay" id="sectorOverlay">
+        <svg id="sectorOverlaySVG" class="sector-overlay-svg" viewBox="0 0 400 400"></svg>
+      </div>
+      <button class="spin-btn" id="spinBtn">SPIN</button>
+      <div class="needle">
+        <div class="needle-shape"></div>
+        <div class="needle-base"></div>
+      </div>
+    </div>
+  </div>
+  <div class="content-overlay" id="contentOverlay">
+    <div class="content-box" id="contentBox">
+      <div class="content-title" id="contentTitle"></div>
+      <div class="content-desc" id="contentDesc"></div>
+    </div>
+  </div>
+  <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
+  <div class="dialogue-box">
+    <p>"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
+  </div>
+  <script>
+    // Wheel configuration
+    const sectors = [
+      {
+        label: "About Me",
+        color: "#3498db",
+        content: `<b>Hello!</b><br>
+          A dedicated and enthusiastic learner with a deep passion for coding and problem-solving<br><p style="text-align: left;"><b>My Education:</b></p>ANITS College of Engineering, Visakhapatnam<br>B.Tech, ECE<br>2017 - 2021`
+      },
+      {
+        label: "Contact Me",
+        color: "#e67e22",
+        content: `Get in touch:<br>
+          <a href="mailto:coregravity0.0.0@protonmail.com">coregravity0.0.0@protonmail.com</a>`
+      },
+      {
+        label: "Portfolio",
+        color: "#27ae60",
+        content: `Check out my work:<br>
+          <a href="https://github.com/pslkk" style="text-decoration: none;" target="_blank"><i class="fa fa-github" style="font-size:24px"></i> Github</a>`
+      },
+      {
+        label: "Skills",
+        color: "#9b59b6",
+        content: `My top skills:<br>
+          <ul style="margin:0; padding-left:18px; text-align:left;">
+            <li>JavaScript &amp; React</li>
+            <li>Node.js</li>
+          </ul>`
+      }
+    ];
+    const sectorCount = sectors.length;
+    const sectorAngle = 360 / sectorCount;
+
+    // DOM elements
+    const wheelSVG = document.getElementById('wheelSVG');
+    const sectorOverlay = document.getElementById('sectorOverlay');
+    const sectorOverlaySVG = document.getElementById('sectorOverlaySVG');
+    const spinBtn = document.getElementById('spinBtn');
+    const wheelWrapper = document.getElementById('wheelWrapper');
+    const container = document.getElementById('mainContainer');
+    const contentOverlay = document.getElementById('contentOverlay');
+    const contentTitle = document.getElementById('contentTitle');
+    const contentDesc = document.getElementById('contentDesc');
+    const homeBtn = document.getElementById('homeBtn');
+    const needle = document.querySelector('.needle');
+
+    let spinning = false;
+
+    // Draw the wheel (sectors, colors, labels)
+    function drawWheel() {
+      wheelSVG.innerHTML = '';
+      sectorOverlaySVG.innerHTML = '';
+      let cx = 200, cy = 200, r = 180;
+
+      for (let i = 0; i < sectorCount; i++) {
+        let startAngle = i * sectorAngle;
+        let endAngle = startAngle + sectorAngle;
+        let startRad = (Math.PI / 180) * startAngle;
+        let endRad = (Math.PI / 180) * endAngle;
+        let x1 = cx + r * Math.cos(startRad);
+        let y1 = cy + r * Math.sin(startRad);
+        let x2 = cx + r * Math.cos(endRad);
+        let y2 = cy + r * Math.sin(endRad);
+        let largeArc = sectorAngle > 180 ? 1 : 0;
+        let pathData = [
+          `M ${cx} ${cy}`,
+          `L ${x1} ${y1}`,
+          `A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`,
+          'Z'
+        ].join(' ');
+
+        // Draw colored sector
+        let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathData);
+        path.setAttribute('fill', sectors[i].color);
+        path.setAttribute('stroke', '#fff');
+        path.setAttribute('stroke-width', '4');
+        wheelSVG.appendChild(path);
+
+        // Draw label
+        let labelAngle = startAngle + sectorAngle / 2;
+        let labelRad = (Math.PI / 180) * labelAngle;
+        let lx = cx + (r - 70) * Math.cos(labelRad);
+        let ly = cy + (r - 70) * Math.sin(labelRad);
+
+        let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', lx);
+        text.setAttribute('y', ly);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-size', '1.1rem');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('fill', '#fff');
+        text.setAttribute('pointer-events', 'none');
+        text.setAttribute('style', 'text-shadow:0 2px 8px rgba(0,0,0,0.22);');
+        text.textContent = sectors[i].label;
+        wheelSVG.appendChild(text);
+
+        // Draw transparent clickable sector overlay
+        let area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        area.setAttribute('d', pathData);
+        area.setAttribute('class', 'sector-area');
+        area.setAttribute('data-sector', i);
+        area.setAttribute('fill', '#000');
+        area.setAttribute('tabindex', 0);
+        area.setAttribute('aria-label', sectors[i].label);
+        area.addEventListener('click', (e) => {
+          if (spinning) return;
+          spinToSector(i);
+        });
+        sectorOverlaySVG.appendChild(area);
+      }
+
+      // Add a title for accessibility
+      let title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = "The Wheel of Life: A PSLKK Journey";
+      wheelSVG.appendChild(title);
+    }
+
+    // Spin logic: animates the needle and reveals content
+    function spinToSector(sectorIdx) {
+      if (spinning) return;
+      spinning = true;
+      spinBtn.disabled = true;
+      wheelWrapper.classList.add('wheel-blocked');
+
+      let extraSpins = 4 + Math.floor(Math.random() * 2);
+      let centerAngleOfSector = (sectorIdx * sectorAngle) + (sectorAngle / 2);
+      let adjustedNeedleTargetAngle = centerAngleOfSector + 90;
+      let finalNeedleRotationAnimated = extraSpins * 360 + adjustedNeedleTargetAngle;
+      let finalNeedleRotationForSnap = (adjustedNeedleTargetAngle % 360 + 360) % 360;
+
+      needle.style.transition = 'transform 3.2s cubic-bezier(.22,1.12,.58,1)';
+      needle.style.transform = `translate(-50%, -100%) rotate(${finalNeedleRotationAnimated}deg)`;
+
+      setTimeout(() => {
+        needle.style.transition = '';
+        needle.style.transform = `translate(-50%, -100%) rotate(${finalNeedleRotationForSnap}deg)`;
+
+        const winningSectorColor = sectors[sectorIdx].color;
+        document.body.style.transition = 'background 0.7s cubic-bezier(.77,0,.18,1)';
+        document.body.style.background = winningSectorColor;
+        contentOverlay.style.background = winningSectorColor;
+
+        setTimeout(() => {
+          showContent(sectorIdx);
+        }, 900);
+      }, 3200);
+    }
+
+    function showContent(idx) {
+      contentTitle.textContent = sectors[idx].label;
+      contentDesc.innerHTML = sectors[idx].content;
+      contentOverlay.classList.add('active');
+      homeBtn.classList.add('active');
+      container.style.filter = 'blur(5px) grayscale(0.7)';
+      document.body.classList.add('show-content');
+      contentOverlay.style.pointerEvents = 'all';
+    }
+
+    function hideContent() {
+      contentOverlay.classList.remove('active');
+      homeBtn.classList.remove('active');
+      container.style.filter = '';
+      document.body.classList.remove('show-content');
+      contentOverlay.style.pointerEvents = 'none';
+      spinning = false;
+      spinBtn.disabled = false;
+      wheelWrapper.classList.remove('wheel-blocked');
+      document.body.style.transition = 'background 0.6s cubic-bezier(.77,0,.18,1)';
+      document.body.style.background = '#f0f0f0';
+      needle.style.transition = '';
+      needle.style.transform = 'translate(-50%, -100%) rotate(0deg)';
+    }
+
+    spinBtn.addEventListener('click', () => {
+      if (spinning) return;
+      let randomIdx = Math.floor(Math.random() * sectorCount);
+      spinToSector(randomIdx);
+    });
+
+    homeBtn.addEventListener('click', () => {
+      hideContent();
+    });
+
+    contentOverlay.addEventListener('touchmove', (e) => {
+      if (contentOverlay.classList.contains('active')) e.preventDefault();
+    }, {passive:false});
+
+    // Keyboard accessibility for clicking on sector areas
+    /*sectorOverlaySVG.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.classList.contains('sector-area')) {
+        let idx = +e.target.getAttribute('data-sector');
+        if (!spinning) spinToSector(idx);
+      }
+    });*/
+
+    drawWheel();
+    window.addEventListener('resize', () => { drawWheel(); });
+  </script>
+</body>
+</html>
