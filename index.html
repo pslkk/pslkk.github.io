@@ -521,6 +521,7 @@
         for (let i = 0; i < numStrings; i++) {
             for (let j = 0; j < dotsPerString; j++) {
                 const dot = document.createElement('div');
+                dot.style.background = 'none';
                 dot.style.background = winningSectorColor;
                 dot.classList.add('dot');
                 scene.appendChild(dot);
