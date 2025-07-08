@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>The Wheel of Life: A PSLKK Journey</title>
+  <title>P S L Krishna Kanth Journey — The Wheel of Life</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
@@ -501,7 +501,7 @@
 
       // Add a title for accessibility
       let title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-      title.textContent = "The Wheel of Life: A PSLKK Journey";
+      title.textContent = "P S L Krishna Kanth Journey — The Wheel of Life";
       wheelSVG.appendChild(title);
     }
 
@@ -528,8 +528,7 @@
         for (let i = 0; i < numStrings; i++) {
           for (let j = 0; j < dotsPerString; j++) {
             const dot = document.createElement('div');
-            dot.style.background = 'none';
-            dot.style.background = winningSectorColor;
+            dot.style.background = color;
             dot.classList.add('dot');
             scene.appendChild(dot);
             const baseX = (i * stringSpacingX) - (totalGridWidth / 2);
