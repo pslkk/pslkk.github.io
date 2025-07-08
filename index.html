@@ -404,7 +404,7 @@
     // New Start
     const helloMsg = document.getElementById('helloMessage');
     const scene = document.getElementById('scene');
-    const numStrings = 25;
+    let numStrings;
     const dotsPerString = 25;
     const stringSpacingX = 65;
     const dotSpacingZ = 65;
@@ -413,9 +413,23 @@
     const waveSpeed = 1.2;
     const waveLengthFactor = 2 * Math.PI;
 
-    const allDots = [];
-    const totalGridWidth = (numStrings - 1) * stringSpacingX;
-    const totalGridDepth = (dotsPerString - 1) * dotSpacingZ;
+    let allDots = [];
+    let totalGridWidth;
+    let totalGridDepth;
+
+    function calculateNumStrings() {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 750) {
+          numStrings = 10;
+      } else if (screenWidth < 1200) {
+          numStrings = 18;
+      } else {
+          numStrings = 25;
+      }
+      totalGridWidth = (numStrings - 1) * stringSpacingX;
+      totalGridDepth = (dotsPerString - 1) * dotSpacingZ;
+    }
+    calculateNumStrings();
     // New End
 
     let spinning = false;
@@ -507,6 +521,34 @@
       needle.style.transition = 'transform 3.2s cubic-bezier(.22,1.12,.58,1)';
       needle.style.transform = `translate(-50%, -100%) rotate(${finalNeedleRotationAnimated}deg)`;
 
+      // New Start
+      function createSceneDots(color) {
+        scene.innerHTML = '';
+        allDots = [];
+        for (let i = 0; i < numStrings; i++) {
+          for (let j = 0; j < dotsPerString; j++) {
+            const dot = document.createElement('div');
+            dot.style.background = 'none';
+            dot.style.background = winningSectorColor;
+            dot.classList.add('dot');
+            scene.appendChild(dot);
+            const baseX = (i * stringSpacingX) - (totalGridWidth / 2);
+            const baseZ = (j * dotSpacingZ) - (totalGridDepth / 2);
+
+            dot.style.transform = `translateX(${baseX}px) translateY(0px) translateZ(${baseZ}px)`;
+
+            allDots.push({
+              element: dot,
+              baseX: baseX,
+              baseZ: baseZ,
+              stringIndex: i,
+              dotIndex: j
+            });
+          }
+        }
+      }
+      // New End
+
       setTimeout(() => {
         needle.style.transition = '';
         needle.style.transform = `translate(-50%, -100%) rotate(${finalNeedleRotationForSnap}deg)`;
@@ -518,28 +560,9 @@
         // New Start
         helloMsg.style.color = "white";
         document.body.style.background = "black";
-        for (let i = 0; i < numStrings; i++) {
-            for (let j = 0; j < dotsPerString; j++) {
-                const dot = document.createElement('div');
-                dot.style.background = 'none';
-                dot.style.background = winningSectorColor;
-                dot.classList.add('dot');
-                scene.appendChild(dot);
-                const baseX = (i * stringSpacingX) - (totalGridWidth / 2);
-                const baseZ = (j * dotSpacingZ) - (totalGridDepth / 2);
-
-                dot.style.transform = `translateX(${baseX}px) translateY(0px) translateZ(${baseZ}px)`;
-
-                allDots.push({
-                    element: dot,
-                    baseX: baseX,
-                    baseZ: baseZ,
-                    stringIndex: i,
-                    dotIndex: j
-                });
-            }
-        }
+        createSceneDots(winningSectorColor);
         // New End
+        
         contentOverlay.style.background = winningSectorColor;
 
         setTimeout(() => {
@@ -596,7 +619,10 @@
     });*/
 
     drawWheel();
-    window.addEventListener('resize', () => { drawWheel(); });
+    window.addEventListener('resize', () => {
+      drawWheel();
+      calculateNumStrings();
+    });
 
     // New Start
     document.addEventListener('DOMContentLoaded', () => {
