@@ -11,13 +11,23 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
+      /*overflow-x: hidden;*/ 
       font-family: Arial, Helvetica, sans-serif;
       background: #f0f0f0;
       transition: background 0.6s cubic-bezier(.77,0,.18,1);
+      /* New Start */
+      perspective: 800px;
+      perspective-origin: center center;
+      overflow: hidden;
+      /* New End */
     }
     body.spinning, body.show-content { overflow: hidden; }
+
     .container {
+      /* New Start */
+      position: relative;
+      z-index: 10;
+      /*New End */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -227,6 +237,7 @@
       border-radius: 10px;
       padding: 15px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 11;
     }
     .dialogue-box p {
       margin: 0;
@@ -234,11 +245,92 @@
       font-size: 1rem;
       color: #333;
     }
+
+    /* New Start */
+    #scene {
+      display: flex;
+      position: fixed;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      transform-style: preserve-3d;
+      transform: rotateX(-22deg);
+      z-index: 0;
+    }
+
+    .dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      /*background-color: #00ffcc;*/
+      border-radius: 50%;
+      opacity: 0.8; 
+      box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+    }
+
+    @media (max-width: 700px) {
+      .wheel-wrapper {
+        width: 280px;
+        height: 280px;
+        margin-bottom: 20px;
+      }
+      .spin-btn {
+        width: 76px;
+        height: 76px;
+        font-size: 1.2rem;
+      }
+      .needle {
+        width: 10px;
+        height: 62px;
+      }
+      .needle-shape {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 28px solid #333;
+      }
+      .needle-base {
+        width: 14px;
+        height: 14px;
+      }
+      .content-box {
+        padding: 25px 30px;
+        min-width: unset;
+        max-width: 95vw;
+      }
+      .content-title {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+      }
+      .content-desc {
+        font-size: 1rem;
+      }
+      .home-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.8rem;
+        bottom: 20px;
+        right: 20px;
+      }
+      .hello-message {
+        font-size: 1.2rem;
+        top: 18px;
+      }
+      .dialogue-box {
+        padding: 10px;
+        bottom: 5px;
+      }
+      .dialogue-box p {
+        font-size: 0.85rem;
+      }
+    }
+    /* New End */
   </style>
 </head>
 <body>
+  <div id="scene"></div>
   <div class="container" id="mainContainer">
-    <div class="hello-message">Welcome! I'm P.S.L. Krishna Kanth</div>
+    <div class="hello-message" id="helloMessage">Welcome! I'm P.S.L. Krishna Kanth</div>
     <div class="wheel-wrapper" id="wheelWrapper">
       <svg class="wheel-svg" id="wheelSVG" viewBox="0 0 400 400"></svg>
       <div class="sector-overlay" id="sectorOverlay">
@@ -260,6 +352,7 @@
   <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
   <div class="dialogue-box">
     <p>"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
+    <p style="display: flex; justify-content: center; margin-top: 20px; font-weight: 700;"><span id="yearftr"></span>pslkk.space</p>
   </div>
   <script>
     // Wheel configuration
@@ -307,6 +400,23 @@
     const contentDesc = document.getElementById('contentDesc');
     const homeBtn = document.getElementById('homeBtn');
     const needle = document.querySelector('.needle');
+
+    // New Start
+    const helloMsg = document.getElementById('helloMessage');
+    const scene = document.getElementById('scene');
+    const numStrings = 25;
+    const dotsPerString = 25;
+    const stringSpacingX = 65;
+    const dotSpacingZ = 65;
+
+    const waveAmplitude = 80;
+    const waveSpeed = 1.2;
+    const waveLengthFactor = 2 * Math.PI;
+
+    const allDots = [];
+    const totalGridWidth = (numStrings - 1) * stringSpacingX;
+    const totalGridDepth = (dotsPerString - 1) * dotSpacingZ;
+    // New End
 
     let spinning = false;
 
@@ -402,8 +512,33 @@
         needle.style.transform = `translate(-50%, -100%) rotate(${finalNeedleRotationForSnap}deg)`;
 
         const winningSectorColor = sectors[sectorIdx].color;
-        document.body.style.transition = 'background 0.7s cubic-bezier(.77,0,.18,1)';
-        document.body.style.background = winningSectorColor;
+        //document.body.style.transition = 'background 0.7s cubic-bezier(.77,0,.18,1)';
+        //document.body.style.background = winningSectorColor;
+
+        // New Start
+        helloMsg.style.color = "white";
+        document.body.style.background = "black";
+        for (let i = 0; i < numStrings; i++) {
+            for (let j = 0; j < dotsPerString; j++) {
+                const dot = document.createElement('div');
+                dot.style.background = winningSectorColor;
+                dot.classList.add('dot');
+                scene.appendChild(dot);
+                const baseX = (i * stringSpacingX) - (totalGridWidth / 2);
+                const baseZ = (j * dotSpacingZ) - (totalGridDepth / 2);
+
+                dot.style.transform = `translateX(${baseX}px) translateY(0px) translateZ(${baseZ}px)`;
+
+                allDots.push({
+                    element: dot,
+                    baseX: baseX,
+                    baseZ: baseZ,
+                    stringIndex: i,
+                    dotIndex: j
+                });
+            }
+        }
+        // New End
         contentOverlay.style.background = winningSectorColor;
 
         setTimeout(() => {
@@ -431,8 +566,8 @@
       spinning = false;
       spinBtn.disabled = false;
       wheelWrapper.classList.remove('wheel-blocked');
-      document.body.style.transition = 'background 0.6s cubic-bezier(.77,0,.18,1)';
-      document.body.style.background = '#f0f0f0';
+      //document.body.style.transition = 'background 0.6s cubic-bezier(.77,0,.18,1)';
+      //document.body.style.background = '#f0f0f0';
       needle.style.transition = '';
       needle.style.transform = 'translate(-50%, -100%) rotate(0deg)';
     }
@@ -461,6 +596,28 @@
 
     drawWheel();
     window.addEventListener('resize', () => { drawWheel(); });
+
+    // New Start
+    document.addEventListener('DOMContentLoaded', () => {
+            function animate() {
+                const time = performance.now() / 1000;
+
+                allDots.forEach(dotData => {
+                    const { element, baseX, baseZ, dotIndex } = dotData;
+                    const phase = (dotIndex / dotsPerString * waveLengthFactor) + time * waveSpeed;
+                    const y = Math.sin(phase) * waveAmplitude;
+                    const normalizedZ = (baseZ + (totalGridDepth / 2)) / totalGridDepth;
+                    element.style.opacity = 0.3 + 0.7 * (1 - normalizedZ); 
+                    element.style.transform = `translateX(${baseX}px) translateY(${y}px) translateZ(${baseZ}px)`;
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+
+        const currentYearftr = new Date().getFullYear();
+        document.getElementById('yearftr').innerHTML = currentYearftr + " &copy;" + "&nbsp;";
+        // New End
   </script>
 </body>
 </html>
