@@ -266,7 +266,7 @@
       height: 6px;
       /*background-color: #00ffcc;*/
       border-radius: 50%;
-      opacity: 0.8; 
+      opacity: 1; /* 0.8 - 1 */
       box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
     }
 
@@ -632,9 +632,21 @@
                     const { element, baseX, baseZ, dotIndex } = dotData;
                     const phase = (dotIndex / dotsPerString * waveLengthFactor) + time * waveSpeed;
                     const y = Math.sin(phase) * waveAmplitude;
-                    const normalizedZ = (baseZ + (totalGridDepth / 2)) / totalGridDepth;
-                    element.style.opacity = 0.3 + 0.7 * (1 - normalizedZ); 
-                    element.style.transform = `translateX(${baseX}px) translateY(${y}px) translateZ(${baseZ}px)`;
+                    //const normalizedZ = (baseZ + (totalGridDepth / 2)) / totalGridDepth;
+                    //element.style.opacity = 0.3 + 0.7 * (1 - normalizedZ);
+                    const combinedY = -y;
+
+                    let minScale, maxScale;
+                    if (y >= 0) {
+                      minScale = 0.5;
+                      maxScale = 1;
+                    } else {
+                      minScale = 0.5;
+                      maxScale = 0.1;
+                    }
+                    const scaleFactor = Math.abs(y / waveAmplitude);
+                    const currentScale = minScale + (maxScale - minScale) * scaleFactor;
+                    element.style.transform = `translateX(${baseX}px) translateY(${combinedY}px) translateZ(${baseZ}px) scale(${currentScale})`;
                 });
                 requestAnimationFrame(animate);
             }
