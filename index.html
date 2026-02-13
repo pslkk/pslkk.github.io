@@ -354,7 +354,28 @@
     <p>"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
     <p style="display: flex; justify-content: center; margin-top: 20px; font-weight: 700;"><span id="yearftr"></span>pslkk.space</p>
   </div>
+  <div id="views">Loading...</div>
   <script>
+    (async () => {
+      const path = encodeURIComponent(window.location.pathname || '/');
+      try {
+        // Fetch current stats
+        const res = await fetch(`/api/views?path=${path}`);
+        const { total, unique } = await res.json();
+        document.getElementById('views').textContent = 
+          `Page Views: ${total.toLocaleString()}, Unique: ${unique.toLocaleString()}`;
+    
+        // Increment (fire-and-forget)
+        fetch('/api/views', { 
+          method: 'POST', 
+          body: JSON.stringify({ path }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch {
+        document.getElementById('views').textContent = 'Counter unavailable';
+      }
+    })();
+    
     // Wheel configuration
     const sectors = [
       {
