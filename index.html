@@ -324,6 +324,15 @@
         font-size: 0.85rem;
       }
     }
+    .views-counter {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 0.875rem;
+      color: #666;
+      background: #f8f9fa;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+    }
     /* New End */
   </style>
 </head>
@@ -351,29 +360,63 @@
   </div>
   <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
   
-  <div id="views-counter" style="color: black;">Loading...</div>
-<script>
-(async () => {
-  const path = encodeURIComponent(window.location.pathname || '/');
+  <div id="views-counter" class="views-counter">
+    <span>Loading views...</span>
+  </div>
   
-  try {
-    // 1. Show current count (GET)
-    const res = await fetch(`/api/views?path=${path}`);
-    const { total = 0, unique = 0 } = await res.json();
-    document.getElementById('views-counter').textContent = 
-      `📊 ${total.toLocaleString()} views | ${unique.toLocaleString()} unique`;
-    
-    // 2. Increment counter (POST - background)
-    fetch('/api/views', { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: decodeURIComponent(path) })
-    });
-  } catch(e) {
-    document.getElementById('views-counter').textContent = 'Error';
-  }
-})();
+  <script>
 
+    (function() {
+      'use strict';
+  
+      const counterEl = document.getElementById('views-counter');
+      const path = window.location.pathname || '/';
+  
+      // Rate limit: 24h per page per user
+      const cacheKey = `views:${path}`;
+      const lastCount = localStorage.getItem(cacheKey);
+      const now = Date.now();
+      const CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+  
+      if (lastCount && (now - parseInt(lastCount.timestamp)) < CACHE_TTL) {
+        counterEl.innerHTML = `
+          <span>📊 ${Number(lastCount.total).toLocaleString()} views</span>
+          <small style="margin-left: 0.5rem;">| ${Number(lastCount.unique).toLocaleString()} unique</small>
+        `;
+         return;
+      }
+
+      // Fetch current stats
+      fetch(`/api/views?path=${encodeURIComponent(path)}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+      })
+      .then(({ total, unique }) => {
+        // Cache locally
+        localStorage.setItem(cacheKey, JSON.stringify({
+          total, unique, timestamp: now
+        }));
+      
+        // Display
+        counterEl.innerHTML = `
+          <span>📊 ${Number(total).toLocaleString()} views</span>
+          <small style="margin-left: 0.5rem;">| ${Number(unique).toLocaleString()} unique</small>
+        `;
+      })
+      .catch(err => {
+        console.error('Views counter:', err);
+        counterEl.textContent = 'Views unavailable';
+      })
+      .finally(() => {
+        // Always increment (fire & forget - server handles deduping)
+        fetch('/api/views', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path })
+        }).catch(console.error);
+      });
+    })();
     
     // Wheel configuration
     const sectors = [
