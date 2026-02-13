@@ -351,27 +351,29 @@
   </div>
   <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
   
-  <div id="views">Loading...</div>
-  <script>
-    (async () => {
-      const path = encodeURIComponent(window.location.pathname || '/');
-      try {
-        // Fetch current stats
-        const res = await fetch(`/api/views?path=${path}`);
-        const { total, unique } = await res.json();
-        document.getElementById('views').textContent = 
-          `Page Views: ${total.toLocaleString()}, Unique: ${unique.toLocaleString()}`;
+  <div id="views-counter" style="color: black;">Loading...</div>
+<script>
+(async () => {
+  const path = encodeURIComponent(window.location.pathname || '/');
+  
+  try {
+    // 1. Show current count (GET)
+    const res = await fetch(`/api/views?path=${path}`);
+    const { total = 0, unique = 0 } = await res.json();
+    document.getElementById('views-counter').textContent = 
+      `📊 ${total.toLocaleString()} views | ${unique.toLocaleString()} unique`;
     
-        // Increment (fire-and-forget)
-        fetch('/api/views', { 
-          method: 'POST', 
-          body: JSON.stringify({ path }),
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } catch {
-        document.getElementById('views').textContent = 'Counter unavailable';
-      }
-    })();
+    // 2. Increment counter (POST - background)
+    fetch('/api/views', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: decodeURIComponent(path) })
+    });
+  } catch(e) {
+    document.getElementById('views-counter').textContent = 'Error';
+  }
+})();
+
     
     // Wheel configuration
     const sectors = [
