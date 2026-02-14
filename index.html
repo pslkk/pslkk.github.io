@@ -480,8 +480,7 @@
   </div>
 </div>
   <script>
-
-    (async () => {
+    /*(async () => {
       const API_URL = "https://pslkk-nxtpage.krishna-kanth.workers.dev"; 
       const path = window.location.pathname;
 
@@ -491,8 +490,40 @@
         const data = await res.json();
         document.getElementById("views-counter").innerText = `📊 ${data.views} | 👥 ${data.unique}`;
       } catch (e) { console.error(e); }
+    })();*/
 
-      // --- CLICK HANDLERS ---
+    (async () => {
+    // ⬇️ REPLACE THIS WITH YOUR WORKER URL ⬇️
+    const API_URL = "https://pslkk-views-api.yourname.workers.dev";
+    
+    const counterEl = document.getElementById("views-counter");
+    const modalEl = document.getElementById("views-modal");
+    const modalViews = document.getElementById("modal-views");
+    const modalUnique = document.getElementById("modal-unique");
+    
+    // Store data globally so we don't have to re-fetch on click
+    let currentData = { views: 0, unique: 0 };
+
+    // --- FETCH DATA ---
+    try {
+      const path = window.location.pathname;
+      
+      // 1. Increment (POST)
+      await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
+      
+      // 2. Fetch (GET)
+      const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
+      currentData = await res.json();
+
+      // Update the small counter immediately
+      counterEl.innerHTML = `📊 ${currentData.views} <span style="opacity:0.4; margin:0 5px">|</span> 🦄 ${currentData.unique}`;
+
+    } catch (e) {
+      console.error("Stats Error:", e);
+      counterEl.innerHTML = "⚠️ Offline";
+    }
+
+    // --- CLICK HANDLERS ---
     
     // Open Modal
     counterEl.addEventListener("click", () => {
@@ -519,8 +550,8 @@
         counterEl.style.opacity = "1";
       }
     });
-      
-    })();
+
+  })();
     
     /*(function() {
       'use strict';
