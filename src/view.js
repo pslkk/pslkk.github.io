@@ -1,4 +1,76 @@
 export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
+    
+    // --- 1. SECURITY & CORS ---
+    const allowedOrigins = [
+      "https://pslkk.github.io",
+      "https://pslkk.space",
+      "http://127.0.0.1:5500"
+    ];
+    
+    const origin = request.headers.get("Origin");
+    const isAllowed = allowedOrigins.includes(origin);
+    
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": isAllowed ? origin : allowedOrigins[1],
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    // --- 2. BOT PROTECTION ---
+    const ua = request.headers.get("User-Agent") || "";
+    if (ua.toLowerCase().includes("bot") || ua.toLowerCase().includes("spider")) {
+      return new Response(JSON.stringify({ status: "ignored" }), { headers: corsHeaders });
+    }
+
+    // --- 3. LOGIC ---
+    try {
+      const path = url.searchParams.get("path") || "/";
+
+      // GET Stats
+      if (request.method === "GET") {
+        const views = await env.KV_STATS.get(`views::${path}`);
+        const unique = await env.KV_STATS.get(`unique::${path}`);
+        return Response.json({ 
+          views: parseInt(views || 0), 
+          unique: parseInt(unique || 0) 
+        }, { headers: corsHeaders });
+      }
+
+      // POST Increment
+      if (request.method === "POST") {
+        const ipKey = `ip::${path}::${clientIP}`;
+        const hasVisited = await env.KV_STATS.get(ipKey);
+
+        // Background Update (High Performance)
+        ctx.waitUntil((async () => {
+          let currentViews = await env.KV_STATS.get(`views::${path}`);
+          await env.KV_STATS.put(`views::${path}`, (parseInt(currentViews || 0) + 1).toString());
+
+          if (!hasVisited) {
+            let currentUnique = await env.KV_STATS.get(`unique::${path}`);
+            await env.KV_STATS.put(`unique::${path}`, (parseInt(currentUnique || 0) + 1).toString());
+            await env.KV_STATS.put(ipKey, "1", { expirationTtl: 86400 });
+          }
+        })());
+
+        return new Response(JSON.stringify({ status: "ok" }), { headers: corsHeaders });
+      }
+      return new Response("Method not allowed", { status: 405, headers: corsHeaders });
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+    }
+  }
+};
+
+
+/*export default {
   async fetch(request, env) {
     // CORS first - handle OPTIONS preflight
     const origin = request.headers.get('Origin') || request.headers.get('Referer') || '';
@@ -96,7 +168,7 @@ export default {
 };
 
 
-/*export default {
+export default {
   async fetch(request, env) {
     try {
       const url = new URL(request.url);
