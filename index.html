@@ -324,44 +324,29 @@
         font-size: 0.85rem;
       }
     }
-    /*.views-counter {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    .views-counter {
       position: fixed;
       bottom: 20px;
-      right: 20px;
+      left: 20px;
+      z-index: 9998;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(5px);
+      color: #333;
+      padding: 10px 15px;
+      border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: 600;
       font-size: 14px;
-      color: #666;
-      background: #f8f9fa;
-      padding: 8px 12px;
-      pointer-events: none;
-      border-radius: 4px;
-      border: 1px solid #e9ecef;
-      z-index: 9999;
-    }*/
-     .views-counter {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9998;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    color: #333;
-    padding: 10px 15px;
-    border-radius: 50px; /* Pill shape */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    cursor: pointer;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    transition: transform 0.2s ease, opacity 0.2s;
-    border: 1px solid rgba(0,0,0,0.05);
-  }
-  .views-counter:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-  }
+      transition: transform 0.2s ease, opacity 0.2s;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .views-counter:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
 
-  /* Modal Overlay (Background) */
   .views-modal-overlay {
     position: fixed;
     top: 0;
@@ -376,8 +361,6 @@
     align-items: center;
     animation: fadeIn 0.2s ease-out;
   }
-
-  /* Modal Box */
   .views-modal-content {
     background: white;
     padding: 30px;
@@ -390,7 +373,6 @@
     animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  /* Stat Rows */
   .stat-row {
     display: flex;
     align-items: center;
@@ -425,8 +407,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-
-  /* Animations */
+    
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     /* New End */
@@ -455,214 +436,144 @@
     </div>
   </div>
   <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
-  
+  <div class="dialogue-box">
+    <p>"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
+    <p style="display: flex; justify-content: center; margin-top: 20px; font-weight: 700;"><span id="yearftr"></span>pslkk.space</p>
+  </div>
   <div id="views-counter" class="views-counter">
     <span>Loading views...</span>
   </div>
   <div id="views-modal" class="views-modal-overlay" style="display: none;">
-  <div class="views-modal-content">
-    <h3 style="margin-top: 0; color: #333;">Site Analytics</h3>
-    <div class="stat-row">
-      <span class="stat-icon">📊</span>
-      <div class="stat-details">
-        <span class="stat-value" id="modal-views">0</span>
-        <span class="stat-label">Total Views</span>
+    <div class="views-modal-content">
+      <h3 style="margin-top: 0; color: #333;">Site Analytics</h3>
+      <div class="stat-row">
+        <span class="stat-icon">📊</span>
+        <div class="stat-details">
+          <span class="stat-value" id="modal-views">0</span>
+          <span class="stat-label">Total Views</span>
+        </div>
       </div>
-    </div>
-    <div class="stat-row">
-      <span class="stat-icon">👥</span>
-      <div class="stat-details">
-        <span class="stat-value" id="modal-unique">0</span>
-        <span class="stat-label">Unique Visitors</span>
+      <div class="stat-row">
+        <span class="stat-icon">👥</span>
+        <div class="stat-details">
+          <span class="stat-value" id="modal-unique">0</span>
+          <span class="stat-label">Unique Visitors</span>
+        </div>
       </div>
+      <p style="font-size: 12px; color: #999; margin-top: 15px;">Click anywhere outside to close</p>
     </div>
-    <p style="font-size: 12px; color: #999; margin-top: 15px;">Click anywhere outside to close</p>
   </div>
-</div>
   <script>
-    /*(async () => {
-      const API_URL = "https://pslkk-nxtpage.krishna-kanth.workers.dev"; 
-      const path = window.location.pathname;
-
-      try {
-        await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
-        const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
-        const data = await res.json();
-        document.getElementById("views-counter").innerText = `📊 ${data.views} | 👥 ${data.unique}`;
-      } catch (e) { console.error(e); }
-    })();*/
-
     (async () => {
-    // ⬇️ REPLACE THIS WITH YOUR WORKER URL ⬇️
-    const API_URL = "https://pslkk-views-api.yourname.workers.dev";
+      const API_URL = "https://pslkk-nxtpage.krishna-kanth.workers.dev";
     
-    const counterEl = document.getElementById("views-counter");
-    const modalEl = document.getElementById("views-modal");
-    const modalViews = document.getElementById("modal-views");
-    const modalUnique = document.getElementById("modal-unique");
-    
-    // Store data globally so we don't have to re-fetch on click
-    let currentData = { views: 0, unique: 0 };
-
-    // --- FETCH DATA ---
-    try {
-      const path = window.location.pathname;
+      const counterEl = document.getElementById("views-counter");
+      const modalEl = document.getElementById("views-modal");
+      const modalViews = document.getElementById("modal-views");
+      const modalUnique = document.getElementById("modal-unique");
       
-      // 1. Increment (POST)
-      await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
-      
-      // 2. Fetch (GET)
-      const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
-      currentData = await res.json();
-
-      // Update the small counter immediately
-      counterEl.innerHTML = `📊 ${currentData.views} <span style="opacity:0.4; margin:0 5px">|</span> 🦄 ${currentData.unique}`;
-
-    } catch (e) {
-      console.error("Stats Error:", e);
-      counterEl.innerHTML = "⚠️ Offline";
-    }
-
-    // --- CLICK HANDLERS ---
-    
-    // Open Modal
-    counterEl.addEventListener("click", () => {
-      // Hide small counter
-      counterEl.style.opacity = "0";
-      setTimeout(() => counterEl.style.visibility = "hidden", 200); // Wait for fade out
-      
-      // Show Modal
-      modalEl.style.display = "flex";
-      
-      // Update Modal Text
-      modalViews.innerText = currentData.views;
-      modalUnique.innerText = currentData.unique;
-    });
-
-    // Close Modal (Click Outside)
-    modalEl.addEventListener("click", (e) => {
-      if (e.target === modalEl) {
-        // Hide Modal
-        modalEl.style.display = "none";
-        
-        // Show small counter again
-        counterEl.style.visibility = "visible";
-        counterEl.style.opacity = "1";
-      }
-    });
-
-  })();
-    
-    /*(function() {
-      'use strict';
+      let currentData = { views: 0, unique: 0 };
   
+      try {
+        const path = window.location.pathname;
+        await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
+        
+        const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
+        currentData = await res.json();
+  
+        counterEl.innerHTML = `📊 ${currentData.views} <span style="opacity:0.4; margin:0 5px">|</span> 👥 ${currentData.unique}`;
+  
+      } catch (e) {
+        console.error("Stats Error:", e);
+        counterEl.innerHTML = "⚠️ Offline";
+      }
+  
+      // --- CLICK HANDLERS ---
+      
+      // Open Modal
+      counterEl.addEventListener("click", () => {
+        // Hide small counter
+        counterEl.style.opacity = "0";
+        setTimeout(() => counterEl.style.visibility = "hidden", 200); // Wait for fade out
+        
+        // Show Modal
+        modalEl.style.display = "flex";
+        
+        // Update Modal Text
+        modalViews.innerText = currentData.views;
+        modalUnique.innerText = currentData.unique;
+      });
+  
+      // Close Modal (Click Outside)
+      modalEl.addEventListener("click", (e) => {
+        if (e.target === modalEl) {
+          // Hide Modal
+          modalEl.style.display = "none";
+          
+          // Show small counter again
+          counterEl.style.visibility = "visible";
+          counterEl.style.opacity = "1";
+        }
+      });
+  
+    })();
+    
+    /*(async function() {
+      'use strict';
+    
       const counterEl = document.getElementById('views-counter');
       const path = window.location.pathname || '/';
-  
-      // Rate limit: 24h per page per user
       const cacheKey = `views:${path}`;
-      const lastCount = localStorage.getItem(cacheKey);
       const now = Date.now();
-      const CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
-  
-      if (lastCount && (now - parseInt(lastCount.timestamp)) < CACHE_TTL) {
-        counterEl.innerHTML = `
-          <span>📊 ${Number(lastCount.total).toLocaleString()} views</span>
-          <small style="margin-left: 0.5rem;">| ${Number(lastCount.unique).toLocaleString()} unique</small>
-        `;
-         return;
-      }
-
-      // Fetch current stats
-      fetch(`/api/views?path=${encodeURIComponent(path)}`)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-      })
-      .then(({ total, unique }) => {
-        // Cache locally
-        localStorage.setItem(cacheKey, JSON.stringify({
-          total, unique, timestamp: now
-        }));
-      
-        // Display
+      const CACHE_TTL = 24 * 60 * 60 * 1000;
+    
+      const display = (total, unique) => {
         counterEl.innerHTML = `
           <span>📊 ${Number(total).toLocaleString()} views</span>
           <small style="margin-left: 0.5rem;">| ${Number(unique).toLocaleString()} unique</small>
         `;
-      })
-      .catch(err => {
-        console.error('Views counter:', err);
-        counterEl.textContent = 'Views unavailable';
-      })
-      .finally(() => {
-        // Always increment (fire & forget - server handles deduping)
-        fetch('/api/views', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path })
-        }).catch(console.error);
-      });
-    })();
-
-    (async function() {
-  'use strict';
-
-  const counterEl = document.getElementById('views-counter');
-  const path = window.location.pathname || '/';
-  const cacheKey = `views:${path}`;
-  const now = Date.now();
-  const CACHE_TTL = 24 * 60 * 60 * 1000;
-
-  const display = (total, unique) => {
-    counterEl.innerHTML = `
-      <span>📊 ${Number(total).toLocaleString()} views</span>
-      <small style="margin-left: 0.5rem;">| ${Number(unique).toLocaleString()} unique</small>
-    `;
-  };
-
-  // 1. Check Cache
-  let cacheValid = false;
-  const cachedData = localStorage.getItem(cacheKey);
-  
-  if (cachedData) {
-    try {
-      const parsed = JSON.parse(cachedData);
-      if (now - parsed.timestamp < CACHE_TTL) {
-        display(parsed.total, parsed.unique);
-        cacheValid = true;
+      };
+    
+      // 1. Check Cache
+      let cacheValid = false;
+      const cachedData = localStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData);
+          if (now - parsed.timestamp < CACHE_TTL) {
+            display(parsed.total, parsed.unique);
+            cacheValid = true;
+          }
+        } catch (e) {
+          localStorage.removeItem(cacheKey);
+        }
       }
-    } catch (e) {
-      localStorage.removeItem(cacheKey);
-    }
-  }
-
-  try {
-    // 2. Fetch fresh stats
-    const response = await fetch(`/api/view?path=${encodeURIComponent(path)}`);
-    if (!response.ok) throw new Error('Network response was not ok');
     
-    const data = await response.json();
+      try {
+        // 2. Fetch fresh stats
+        const response = await fetch(`/api/view?path=${encodeURIComponent(path)}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        
+        // Update UI and Cache
+        display(data.total, data.unique);
+        localStorage.setItem(cacheKey, JSON.stringify({ ...data, timestamp: now }));
     
-    // Update UI and Cache
-    display(data.total, data.unique);
-    localStorage.setItem(cacheKey, JSON.stringify({ ...data, timestamp: now }));
-
-    // 3. Increment if necessary
-    if (!cacheValid) {
-      await fetch('/api/view', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path })
-      });
-    }
-  } catch (err) {
-    console.error('Counter Error:', err);
-    if (!cacheValid) counterEl.textContent = 'Views unavailable';
-  }
-})();*/
-
-    
+        // 3. Increment if necessary
+        if (!cacheValid) {
+          await fetch('/api/view', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path })
+          });
+        }
+      } catch (err) {
+        console.error('Counter Error:', err);
+        if (!cacheValid) counterEl.textContent = 'Views unavailable';
+      }
+    })();*/
     
     // Wheel configuration
     const sectors = [
@@ -962,8 +873,8 @@
             animate();
         });
 
-        /*const currentYearftr = new Date().getFullYear();
-        document.getElementById('yearftr').innerHTML = currentYearftr + " &copy;" + "&nbsp;";*/
+        const currentYearftr = new Date().getFullYear();
+        document.getElementById('yearftr').innerHTML = currentYearftr + " &copy;" + "&nbsp;";
         // New End
   </script>
 </body>
