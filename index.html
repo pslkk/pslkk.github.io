@@ -324,7 +324,7 @@
         font-size: 0.85rem;
       }
     }
-    .views-counter {
+    /*.views-counter {
       position: fixed;
       bottom: 20px;
       left: 20px;
@@ -341,75 +341,104 @@
       font-size: 14px;
       transition: transform 0.2s ease, opacity 0.2s;
       border: 1px solid rgba(0,0,0,0.05);
+    }*/
+    .views-counter {
+      position: fixed;
+      bottom: 20px;
+      left: 10px;
+      z-index: 9998;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(5px);
+      color: #333;
+      padding: 10px 15px;
+      border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      
+      /* Important for dragging */
+      cursor: grab; 
+      user-select: none; /* Prevents text highlighting while dragging */
+      touch-action: none; /* Prevents scrolling on mobile while dragging */
+      
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+  
+    .views-counter:active {
+      cursor: grabbing;
+      transform: scale(0.95);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
     .views-counter:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     }
 
-  .views-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4); /* Dimmed background */
-    backdrop-filter: blur(3px);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 0.2s ease-out;
-  }
-  .views-modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    width: 90%;
-    max-width: 320px;
-    text-align: center;
-    transform: scale(0.95);
-    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  }
-
-  .stat-row {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 12px;
-  }
-  .stat-icon {
-    font-size: 24px;
-    margin-right: 15px;
-    background: #fff;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  }
-  .stat-details {
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-  }
-  .stat-value {
-    font-size: 18px;
-    font-weight: 800;
-    color: #222;
-  }
-  .stat-label {
-    font-size: 12px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-    
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .views-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4); /* Dimmed background */
+      backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .views-modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 320px;
+      text-align: center;
+      transform: scale(0.95);
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+  
+    .stat-row {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+    .stat-icon {
+      font-size: 24px;
+      margin-right: 15px;
+      background: #fff;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .stat-details {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #222;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+      
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     /* New End */
   </style>
 </head>
@@ -487,11 +516,69 @@
         console.error("Stats Error:", e);
         counterEl.innerHTML = "⚠️ Offline";
       }
+
+      // --- DRAG LOGIC ---
+      let isDragging = false;
+      let startX, startY, initialLeft, initialTop;
+      let hasMoved = false; // To distinguish between a Click and a Drag
+  
+      const startDrag = (e) => {
+        isDragging = true;
+        hasMoved = false;
+        
+        // Get mouse/touch position
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        
+        startX = clientX;
+        startY = clientY;
+        
+        // Get current element position
+        const rect = counterEl.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        
+        // Remove 'bottom/right' CSS so 'top/left' takes over
+        counterEl.style.bottom = 'auto';
+        counterEl.style.right = 'auto';
+        counterEl.style.left = `${initialLeft}px`;
+        counterEl.style.top = `${initialTop}px`;
+      };
+  
+      const doDrag = (e) => {
+        if (!isDragging) return;
+        
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+        
+        // Only count as a "move" if dragged more than 5 pixels
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
+        
+        counterEl.style.left = `${initialLeft + dx}px`;
+        counterEl.style.top = `${initialTop + dy}px`;
+      };
+  
+      const stopDrag = () => {
+        isDragging = false;
+      };
+  
+      // Add Listeners (Mouse & Touch)
+      counterEl.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', doDrag);
+      document.addEventListener('mouseup', stopDrag);
+      
+      counterEl.addEventListener('touchstart', startDrag, { passive: false });
+      document.addEventListener('touchmove', doDrag, { passive: false });
+      document.addEventListener('touchend', stopDrag);
   
       // --- CLICK HANDLERS ---
       
       // Open Modal
       counterEl.addEventListener("click", () => {
+        if (hasMoved) return;
         // Hide small counter
         counterEl.style.opacity = "0";
         setTimeout(() => counterEl.style.visibility = "hidden", 200); // Wait for fade out
