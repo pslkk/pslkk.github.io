@@ -369,6 +369,18 @@
   
   <script>
 
+    (async () => {
+      const API_URL = "https://pslkk-nxtpage.krishna-kanth.workers.dev"; 
+      const path = window.location.pathname;
+
+      try {
+        await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
+        const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
+        const data = await res.json();
+        document.getElementById("views-counter").innerText = `${data.views} | ${data.unique}`;
+      } catch (e) { console.error(e); }
+    })();
+    
     /*(function() {
       'use strict';
   
@@ -419,7 +431,7 @@
           body: JSON.stringify({ path })
         }).catch(console.error);
       });
-    })();*/
+    })();
 
     (async function() {
   'use strict';
@@ -476,7 +488,9 @@
     console.error('Counter Error:', err);
     if (!cacheValid) counterEl.textContent = 'Views unavailable';
   }
-})();
+})();*/
+
+    
     
     // Wheel configuration
     const sectors = [
