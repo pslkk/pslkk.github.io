@@ -10,7 +10,6 @@ export default {
     ];
     
     //const origin = request.headers.get("Origin");
-    const isAllowed = allowedOrigins.includes(origin);
 
     const rawOrigin = request.headers.get("Origin") || request.headers.get("Referer") || "";
     let origin = "";
@@ -22,6 +21,8 @@ export default {
     } catch (e) {
       origin = "";
     }
+
+    const isAllowed = allowedOrigins.includes(origin);
 
      if (!origin || !isAllowed) {
        return new Response(JSON.stringify({ error: "⛔ Access Denied" }), { status: 403 });
