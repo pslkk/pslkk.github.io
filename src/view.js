@@ -6,12 +6,26 @@ export default {
     // --- 1. SECURITY & CORS ---
     const allowedOrigins = [
       "https://pslkk.github.io",
-      "https://pslkk.space",
-      "http://127.0.0.1:5500"
+      "https://pslkk.space"
     ];
     
-    const origin = request.headers.get("Origin");
+    //const origin = request.headers.get("Origin");
     const isAllowed = allowedOrigins.includes(origin);
+
+    const rawOrigin = request.headers.get("Origin") || request.headers.get("Referer") || "";
+    let origin = "";
+    try {
+      if (rawOrigin) {
+        const urlObj = new URL(rawOrigin);
+        origin = urlObj.origin;
+      }
+    } catch (e) {
+      origin = "";
+    }
+
+     if (!origin || !isAllowed) {
+       return new Response(JSON.stringify({ error: "⛔ Access Denied" }), { status: 403 });
+    }
     
     const corsHeaders = {
       "Access-Control-Allow-Origin": isAllowed ? origin : allowedOrigins[1],
