@@ -487,9 +487,9 @@
   
       try {
         const path = window.location.pathname;
-        await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
+        const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`, { method: "POST" });
         
-        const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
+        //const res = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
         currentData = await res.json();
   
         counterEl.innerHTML = `📊 ${currentData.views} <span style="opacity:0.4; margin:0 5px">|</span> 👥 ${currentData.unique}`;
