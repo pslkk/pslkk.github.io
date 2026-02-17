@@ -346,10 +346,12 @@
       font-size: 14px;
       border: 1px solid rgba(0,0,0,0.05);
       transition: transform 0.1s, box-shadow 0.2s;
+      animation: floatr 3s ease-in-out infinite alternate;
     }
   
     .views-counter:active {
       cursor: grabbing;
+      animation: none;
       transform: scale(0.95);
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
@@ -421,6 +423,11 @@
       
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes floatr {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-2px); }
+    }
+
     /* New End */
   </style>
 </head>
