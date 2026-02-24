@@ -326,7 +326,7 @@
     }
     .views-counter {
       position: fixed;
-      bottom: 20px;
+      bottom: 36px;
       left: 10px;
       z-index: 9998;
       background: rgba(255, 255, 255, 0.9);
@@ -1070,7 +1070,7 @@
               idleTimer = setTimeout(showHelpIcon, IDLE_TIME);
             }
           
-            ['mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+            ['keypress', 'scroll', 'touchstart'].forEach(evt => {
               document.addEventListener(evt, resetActivity);
             });
       
