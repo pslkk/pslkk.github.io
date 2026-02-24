@@ -428,6 +428,142 @@
       100% { transform: translateY(-2px); }
     }
 
+    /*.hidden {
+      display: none !important;
+    }*/
+    
+    #help-icon {
+      position: fixed;
+      bottom: 40px;
+      right: 40px; 
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #00c6ff, #0072ff); 
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      animation: pulse 2s infinite;
+      z-index: 999;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+      50% { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,114,255,0.4); }
+      100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    }
+    
+    .modern-dialog {
+      padding: 0;
+      border: none;
+      border-radius: 16px;
+      background: transparent; 
+      max-width: 400px;
+      margin: auto; 
+      overflow: visible; 
+    }
+    .modern-dialog::backdrop {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    .dialog-content {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      font-size: 18px;
+      color: #333;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    .modern-dialog[open] .dialog-content {
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    
+    .close-circle {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #ff4757;
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+      transition: transform 0.2s ease;
+    }
+    .close-circle:hover {
+      transform: scale(1.1);
+    }
+    
+    .cloud-tooltip {
+      position: absolute;
+      background: white;
+      color: #0072ff; 
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      z-index: 500;
+      pointer-events: none; 
+      animation: floatBubble 2.5s infinite ease-in-out, fadeIn 0.4s ease-out;
+    }
+    .cloud-tooltip::after {
+      content: '';
+      position: absolute;
+      border-style: solid;
+    }
+    #tooltip-spin {
+      top: 50%;
+      left: 20%;
+      transform: translateY(-50%);
+    }
+    #tooltip-spin::after {
+      top: 50%;
+      right: -10px;
+      margin-top: -10px;
+      border-width: 10px 0 10px 10px;
+      border-color: transparent transparent transparent white;
+    }
+    #tooltip-aboutme {
+      bottom: 10%;
+      right: 15%; 
+    }
+    #tooltip-aboutme::after {
+      top: -10px;
+      left: 20px;
+      border-width: 0 10px 10px 10px;
+      border-color: transparent transparent white transparent;
+    }
+    
+    @keyframes popIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
     /* New End */
   </style>
 </head>
@@ -445,8 +581,21 @@
         <div class="needle-shape"></div>
         <div class="needle-base"></div>
       </div>
+      <div id="tooltip-spin" class="cloud-tooltip hidden">Press</div>
+      <div id="tooltip-aboutme" class="cloud-tooltip hidden">Or About Me</div>
     </div>
   </div>
+  
+  <div id="help-icon" class="hidden" aria-label="Help">
+    <span>?</span>
+  </div>
+  <dialog id="instruction-modal" class="modern-dialog" aria-labelledby="modal-text">
+    <div class="dialog-content">
+      <button id="close-btn" class="close-circle" aria-label="Close instructions">&times;</button>
+      <p id="modal-text">"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
+    </div>
+  </dialog>
+    
   <div class="content-overlay" id="contentOverlay">
     <div class="content-box" id="contentBox">
       <div class="content-title" id="contentTitle"></div>
@@ -888,6 +1037,92 @@
                 requestAnimationFrame(animate);
             }
             animate();
+      
+            const helpIcon = document.getElementById('help-icon');
+            const modal = document.getElementById('instruction-modal');
+            const closeBtn = document.getElementById('close-btn');
+            const wheelSelector = document.getElementById('wheelWrapper');
+            const tooltipSpin = document.getElementById('tooltip-spin');
+            const tooltipAboutMe = document.getElementById('tooltip-aboutme');
+          
+            let idleTimer;
+            const IDLE_TIME = 4000;
+      
+            function showTooltips() {
+              tooltipSpin.classList.remove('hidden');
+              tooltipAboutMe.classList.remove('hidden');
+            }
+          
+            function hideTooltips() {
+              tooltipSpin.classList.add('hidden');
+              tooltipAboutMe.classList.add('hidden');
+            }
+          
+            function showHelpIcon() {
+              if (!modal.open) { 
+                helpIcon.classList.remove('hidden');
+                hideTooltips();
+              }
+            }
+          
+            function resetActivity() {
+              clearTimeout(idleTimer);
+              helpIcon.classList.add('hidden');
+              idleTimer = setTimeout(showHelpIcon, IDLE_TIME);
+            }
+          
+            ['mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+              document.addEventListener(evt, resetActivity);
+
+            document.addEventListener('click', (e) => {
+              const clickedOnWheel = e.target.closest(wheelSelector);
+              const clickedOnIcon = e.target.closest('#help-icon');
+            
+              if (modal.open || clickedOnIcon) return;
+          
+              if (!clickedOnWheel) {
+                clearTimeout(idleTimer);
+                showHelpIcon(); 
+              } else {
+                hideTooltips(); 
+                resetActivity(); 
+              }
+            });
+          
+            helpIcon.addEventListener('click', () => {
+              modal.showModal(); 
+              helpIcon.classList.add('hidden');
+              document.body.style.overflow = 'hidden';
+            });
+          
+            const closeModal = () => {
+              modal.close();
+              document.body.style.overflow = '';
+              showTooltips();
+              resetActivity(); 
+            };
+          
+            closeBtn.addEventListener('click', closeModal);
+          
+            modal.addEventListener('click', (e) => {
+              const dialogDimensions = modal.getBoundingClientRect();
+              if (
+                e.clientX < dialogDimensions.left ||
+                e.clientX > dialogDimensions.right ||
+                e.clientY < dialogDimensions.top ||
+                e.clientY > dialogDimensions.bottom
+              ) {
+                closeModal();
+              }
+            });
+          
+            modal.addEventListener('cancel', () => {
+              document.body.style.overflow = '';
+              showTooltips();
+              resetActivity();
+            });
+          
+            resetActivity();
         });
 
         const currentYearftr = new Date().getFullYear();
