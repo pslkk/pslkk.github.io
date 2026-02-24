@@ -1073,7 +1073,8 @@
           
             ['mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
               document.addEventListener(evt, resetActivity);
-
+            });
+      
             document.addEventListener('click', (e) => {
               const clickedOnWheel = e.target.closest(wheelSelector);
               const clickedOnIcon = e.target.closest('#help-icon');
