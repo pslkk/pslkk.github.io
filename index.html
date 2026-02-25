@@ -559,8 +559,8 @@
     }
     
     #tooltip-content {
-      top: 100px;
-      right: 40px; 
+      bottom: 32px;
+      right: 55px; 
     }
     #tooltip-content::after {
       bottom: 100%; 
@@ -804,6 +804,8 @@
     const homeBtn = document.getElementById('homeBtn');
     const tooltipContent = document.getElementById('tooltip-content');
     const helpIcon = document.getElementById('help-icon');
+    let idleTimer;
+    const IDLE_TIME = 4000;
     const needle = document.querySelector('.needle');
 
     // New Start
@@ -1065,15 +1067,15 @@
             }
             animate();
       
-            const helpIcon = document.getElementById('help-icon');
+            //const helpIcon = document.getElementById('help-icon');
             const modal = document.getElementById('instruction-modal');
             const closeBtn = document.getElementById('close-btn');
             const wheelSelector = '.wheel-wrapper';
             const tooltipSpin = document.getElementById('tooltip-spin');
             const tooltipAboutMe = document.getElementById('tooltip-aboutme');
           
-            let idleTimer;
-            const IDLE_TIME = 4000;
+            //let idleTimer;
+            //const IDLE_TIME = 4000;
       
             function showTooltips() {
               tooltipSpin.classList.remove('hidden');
