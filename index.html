@@ -552,6 +552,23 @@
       border-color: transparent transparent white transparent;
     }
     
+    #help-icon.content-mode-icon {
+      bottom: auto;
+      top: 40px;
+      transition: all 0.5s ease-in-out;
+    }
+    
+    #tooltip-content {
+      top: 100px;
+      right: 40px; 
+    }
+    #tooltip-content::after {
+      bottom: 100%; 
+      right: 15px;
+      border-width: 0 10px 10px 10px;
+      border-color: transparent transparent white transparent;
+    }
+    
     @keyframes popIn {
       to { opacity: 1; transform: scale(1); }
     }
@@ -603,6 +620,7 @@
     </div>
   </div>
   <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
+  <div id="tooltip-content" class="cloud-tooltip hidden">Home</div>
   <div class="dialogue-box">
     <p style="display: flex; justify-content: center; font-weight: 700;"><span id="yearftr"></span>pslkk.space</p>
   </div>
@@ -784,6 +802,7 @@
     const contentTitle = document.getElementById('contentTitle');
     const contentDesc = document.getElementById('contentDesc');
     const homeBtn = document.getElementById('homeBtn');
+    const tooltipContent = document.getElementById('tooltip-content');
     const needle = document.querySelector('.needle');
 
     // New Start
@@ -963,6 +982,10 @@
       container.style.filter = 'blur(5px) grayscale(0.7)';
       document.body.classList.add('show-content');
       contentOverlay.style.pointerEvents = 'all';
+      
+      helpIcon.classList.add('content-mode-icon');
+      clearTimeout(idleTimer);
+      helpIcon.classList.remove('hidden');
     }
 
     function hideContent() {
@@ -978,6 +1001,10 @@
       //document.body.style.background = '#f0f0f0';
       needle.style.transition = '';
       needle.style.transform = 'translate(-50%, -100%) rotate(0deg)';
+      
+      helpIcon.classList.remove('content-mode-icon');
+      tooltipContent.classList.add('hidden');
+      resetActivity();
     }
 
     spinBtn.addEventListener('click', () => {
@@ -1097,9 +1124,17 @@
             });
           
             helpIcon.addEventListener('click', () => {
-              modal.showModal(); 
-              helpIcon.classList.add('hidden');
-              document.body.style.overflow = 'hidden';
+               if (contentOverlay.classList.contains('active')) {
+                  tooltipContent.classList.remove('hidden');
+                  setTimeout(() => {
+                    tooltipContent.classList.add('hidden');
+                  }, 3000);
+              
+                } else {
+                  modal.showModal(); 
+                  helpIcon.classList.add('hidden');
+                  document.body.style.overflow = 'hidden';
+               }
             });
           
             const closeModal = (e) => {
