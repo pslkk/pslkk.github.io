@@ -544,7 +544,7 @@
     }
     #tooltip-aboutme {
       bottom: 10%;
-      right: 20%; 
+      right: 16%; 
     }
     #tooltip-aboutme::after {
       top: -10px;
@@ -1069,16 +1069,12 @@
             }
             animate();
     });
-            //const helpIcon = document.getElementById('help-icon');
             const modal = document.getElementById('instruction-modal');
             const closeBtn = document.getElementById('close-btn');
             const wheelSelector = '.wheel-wrapper';
             const tooltipSpin = document.getElementById('tooltip-spin');
             const tooltipAboutMe = document.getElementById('tooltip-aboutme');
           
-            //let idleTimer;
-            //const IDLE_TIME = 4000;
-      
             function showTooltips() {
               tooltipSpin.classList.remove('hidden');
               tooltipAboutMe.classList.remove('hidden');
