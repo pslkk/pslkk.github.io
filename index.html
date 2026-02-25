@@ -326,7 +326,7 @@
     }
     .views-counter {
       position: fixed;
-      bottom: 36px;
+      bottom: 63px;
       left: 10px;
       z-index: 9998;
       background: rgba(255, 255, 255, 0.9);
@@ -1071,7 +1071,14 @@
             }
           
             ['keypress', 'scroll', 'touchstart'].forEach(evt => {
-              document.addEventListener(evt, resetActivity);
+              document.addEventListener(evt, (e) => {
+                const touchingIcon = e.target.closest('#help-icon');
+                const touchingModal = e.target.closest('#instruction-modal');
+                if (touchingIcon || touchingModal) {
+                  return; 
+                }
+                resetActivity();
+              });
             });
       
             document.addEventListener('click', (e) => {
@@ -1095,7 +1102,10 @@
               document.body.style.overflow = 'hidden';
             });
           
-            const closeModal = () => {
+            const closeModal = (e) => {
+              if (e) {
+                e.stopPropagation(); 
+              }
               modal.close();
               document.body.style.overflow = '';
               showTooltips();
@@ -1112,14 +1122,12 @@
                 e.clientY < dialogDimensions.top ||
                 e.clientY > dialogDimensions.bottom
               ) {
-                closeModal();
+                closeModal(e);
               }
             });
           
-            modal.addEventListener('cancel', () => {
-              document.body.style.overflow = '';
-              showTooltips();
-              resetActivity();
+            modal.addEventListener('cancel', (e) => {
+              closeModal(e);
             });
           
             resetActivity();
