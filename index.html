@@ -978,12 +978,6 @@
         }, 900);
       }, 3200);
     }
-
-    function resetActivity() {
-      clearTimeout(idleTimer);
-      helpIcon.classList.add('hidden');
-      idleTimer = setTimeout(showHelpIcon, IDLE_TIME);
-    }
     
     function showContent(idx) {
       contentTitle.textContent = sectors[idx].label;
@@ -1100,6 +1094,12 @@
                 helpIcon.classList.remove('hidden');
                 hideTooltips();
               }
+            }
+
+            function resetActivity() {
+              clearTimeout(idleTimer);
+              helpIcon.classList.add('hidden');
+              idleTimer = setTimeout(showHelpIcon, IDLE_TIME);
             }
           
             ['keypress', 'scroll', 'touchstart'].forEach(evt => {
