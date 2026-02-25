@@ -499,6 +499,7 @@
       background: #ff4757;
       color: white;
       border: none;
+      outline: none;
       font-size: 20px;
       cursor: pointer;
       display: flex;
@@ -559,7 +560,7 @@
     }
     
     #tooltip-content {
-      bottom: 30px;
+      bottom: 34px;
       right: 90px; 
     }
     #tooltip-content::after {
@@ -978,6 +979,12 @@
       }, 3200);
     }
 
+    function resetActivity() {
+      clearTimeout(idleTimer);
+      helpIcon.classList.add('hidden');
+      idleTimer = setTimeout(showHelpIcon, IDLE_TIME);
+    }
+    
     function showContent(idx) {
       contentTitle.textContent = sectors[idx].label;
       contentDesc.innerHTML = sectors[idx].content;
@@ -1093,12 +1100,6 @@
                 helpIcon.classList.remove('hidden');
                 hideTooltips();
               }
-            }
-          
-            function resetActivity() {
-              clearTimeout(idleTimer);
-              helpIcon.classList.add('hidden');
-              idleTimer = setTimeout(showHelpIcon, IDLE_TIME);
             }
           
             ['keypress', 'scroll', 'touchstart'].forEach(evt => {
