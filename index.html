@@ -324,6 +324,7 @@
         font-size: 0.85rem;
       }
     }
+    
     .views-counter {
       position: fixed;
       bottom: 63px;
@@ -581,6 +582,36 @@
     @keyframes floatBubble {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
+    }
+
+    @media (max-width: 340px) {
+      .cloud-tooltip {
+        font-size: 12px;
+        padding: 9px 12px;
+      }
+      #tooltip-spin {
+        left: 18%;
+      }
+      /*#tooltip-spin::after {
+        border-width: 8px 0 8px 8px;
+        right: -8px;
+      }*/
+      #tooltip-aboutme {
+        right: 16%;
+      }
+      /*#tooltip-aboutme::after {
+        border-width: 0 8px 8px 8px;
+        top: -8px;
+        left: 15px;
+      }
+      #tooltip-content {
+        bottom: 45px; 
+        right: 65px;  
+      }
+      #tooltip-content::after {
+        border-width: 6px 0 6px 8px;
+        right: -8px; 
+      }*/
     }
 
     /* New End */
