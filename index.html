@@ -269,61 +269,6 @@
       opacity: 1; /* 0.8 - 1 */
       box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
     }
-
-    @media ((max-height: 600px) and (max-width: 704px)) or  (max-height: 530px) {
-      .wheel-wrapper {
-        width: 320px;
-        height: 320px;
-      }
-      .spin-btn {
-        width: 84px;
-        height: 84px;
-        font-size: 1.2rem;
-      }
-      .needle {
-        width: 10px;
-        height: 63px;
-      }
-      .needle-shape {
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-bottom: 28px solid #333;
-      }
-      .needle-base {
-        width: 14px;
-        height: 14px;
-      }
-      /*.content-box {
-        padding: 25px 30px;
-        min-width: unset;
-        max-width: 95vw;
-      }
-      .content-title {
-        font-size: 1.8rem;
-        margin-bottom: 12px;
-      }
-      .content-desc {
-        font-size: 1rem;
-      }
-      .home-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1.8rem;
-        bottom: 20px;
-        right: 20px;
-      }*/
-      .hello-message {
-        font-size: 1.2rem;
-        top: 18px;
-      }
-      .dialogue-box {
-        padding: 10px;
-        bottom: 5px;
-      }
-      .dialogue-box p {
-        font-size: 0.85rem;
-      }
-    }
     
     .views-counter {
       position: fixed;
@@ -584,34 +529,72 @@
       50% { transform: translateY(-8px); }
     }
 
-    @media (max-width: 340px) {
-      .cloud-tooltip {
+    @media ((max-height: 600px) and (max-width: 704px)) or (max-height: 530px) or (max-width: 530px) {
+      .wheel-wrapper {
+        width: 320px;
+        height: 320px;
+      }
+      .spin-btn {
+        width: 84px;
+        height: 84px;
+        font-size: 1.2rem;
+      }
+      .needle {
+        width: 10px;
+        height: 63px;
+      }
+      .needle-shape {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 28px solid #333;
+      }
+      .needle-base {
+        width: 14px;
+        height: 14px;
+      }
+      /*.content-box {
+        padding: 25px 30px;
+        min-width: unset;
+        max-width: 95vw;
+      }
+      .content-title {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+      }
+      .content-desc {
+        font-size: 1rem;
+      }
+      .home-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.8rem;
+        bottom: 20px;
+        right: 20px;
+      }*/
+      .hello-message {
+        font-size: 1.2rem;
+        top: 18px;
+      }
+      .dialogue-box {
+        padding: 10px;
+        bottom: 5px;
+      }
+      .dialogue-box p {
+        font-size: 0.85rem;
+      }
+       .cloud-tooltip {
         font-size: 12px;
         padding: 9px 12px;
       }
       #tooltip-spin {
         left: 18%;
       }
-      /*#tooltip-spin::after {
-        border-width: 8px 0 8px 8px;
-        right: -8px;
-      }*/
       #tooltip-aboutme {
         right: 16%;
       }
-      /*#tooltip-aboutme::after {
-        border-width: 0 8px 8px 8px;
-        top: -8px;
-        left: 15px;
-      }
       #tooltip-content {
-        bottom: 45px; 
-        right: 65px;  
+        bottom: 33px;  
       }
-      #tooltip-content::after {
-        border-width: 6px 0 6px 8px;
-        right: -8px; 
-      }*/
     }
 
     /* New End */
