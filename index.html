@@ -766,8 +766,9 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.05);
       border: 1px solid rgba(0,0,0,0.05);
       max-width: 600px;
+      max-height: 90%;
       width: 90%;
-      height: 90%;
+      height: auto;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: rgba(100, 116, 139, 0.4) transparent; 
@@ -867,6 +868,33 @@
       }
       #tooltip-content {
         bottom: 37px;
+      }
+    }
+
+    @media (max-width: 583px) {
+      .modern-profile-switcher {
+        top: 16px;
+        left: 16px;
+        right: 16px;
+      }
+      .switcher-toggle {
+        width: auto;
+        padding: 8px 14px;
+      }
+      .active-profile-info {
+        font-size: 14px;
+      }
+      .hello-message {
+        margin-top: 50px;
+      }
+      .placeholder-content {
+        margin-top: 20px;
+        padding: 30px 20px;
+        width: 95%;
+      }
+      .placeholder-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 24px;
       }
     }
 
