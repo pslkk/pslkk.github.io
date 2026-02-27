@@ -17,21 +17,39 @@
       --shadow: 0 10px 40px -10px rgba(0,0,0,0.12);
       --bg-page: #f8fafc;
     }
+
+     * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f0f0f0;
+      overflow-x: hidden;
+    }
     
-    html, body {
+    /*html, body {
       height: 100%;
       margin: 0;
       padding: 0;
-      /*overflow-x: hidden;*/
       font-family: Arial, Helvetica, sans-serif;
       background: #f0f0f0;
       transition: background 0.6s cubic-bezier(.77,0,.18,1);
-      /* New Start */
       perspective: 800px;
       perspective-origin: center center;
       overflow: hidden;
-      /* New End */
+    }*/
+    
+    #hobbyist {
+      background: #f0f0f0;
+      transition: background 0.6s cubic-bezier(.77,0,.18,1);
+      perspective: 800px;
+      perspective-origin: center center;
+      overflow: hidden;
     }
+    
     body.spinning, body.show-content { overflow: hidden; }
 
     .container {
@@ -861,64 +879,62 @@
     </div>
   </nav>
 
-  <div id="scene"></div>
   <main class="content-container">
-  <section id="hobbyist" class="profile-section is-active" aria-labelledby="hobbyist-title">
-  <div class="container" id="mainContainer">
-    <div class="hello-message" id="helloMessage">Welcome! I'm P.S.L. Krishna Kanth</div>
-    <div class="wheel-wrapper" id="wheelWrapper">
-      <svg class="wheel-svg" id="wheelSVG" viewBox="0 0 400 400"></svg>
-      <div class="sector-overlay" id="sectorOverlay">
-        <svg id="sectorOverlaySVG" class="sector-overlay-svg" viewBox="0 0 400 400"></svg>
+    <section id="hobbyist" class="profile-section is-active" aria-labelledby="hobbyist-title">
+      <div id="scene"></div>
+      <div class="container" id="mainContainer">
+        <div class="hello-message" id="helloMessage">Welcome! I'm P.S.L. Krishna Kanth</div>
+        <div class="wheel-wrapper" id="wheelWrapper">
+          <svg class="wheel-svg" id="wheelSVG" viewBox="0 0 400 400"></svg>
+          <div class="sector-overlay" id="sectorOverlay">
+            <svg id="sectorOverlaySVG" class="sector-overlay-svg" viewBox="0 0 400 400"></svg>
+          </div>
+          <button class="spin-btn" id="spinBtn">SPIN</button>
+          <div class="needle">
+            <div class="needle-shape"></div>
+            <div class="needle-base"></div>
+          </div>
+          <div id="tooltip-spin" class="cloud-tooltip hidden">Press</div>
+          <div id="tooltip-aboutme" class="cloud-tooltip hidden">Or About Me</div>
+        </div>
       </div>
-      <button class="spin-btn" id="spinBtn">SPIN</button>
-      <div class="needle">
-        <div class="needle-shape"></div>
-        <div class="needle-base"></div>
-      </div>
-      <div id="tooltip-spin" class="cloud-tooltip hidden">Press</div>
-      <div id="tooltip-aboutme" class="cloud-tooltip hidden">Or About Me</div>
-    </div>
-  </div>
-  
-  <div id="help-icon" class="hidden" aria-label="Help">
-    <span>?</span>
-  </div>
-  <dialog id="instruction-modal" class="modern-dialog" aria-labelledby="modal-text">
-    <div class="dialog-content">
-      <button id="close-btn" class="close-circle" aria-label="Close instructions">&times;</button>
-      <p id="modal-text">"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
-    </div>
-  </dialog>
     
-  <div class="content-overlay" id="contentOverlay">
-    <div class="content-box" id="contentBox">
-      <div class="content-title" id="contentTitle"></div>
-      <div class="content-desc" id="contentDesc"></div>
-    </div>
-  </div>
-  <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
-  <div id="tooltip-content" class="cloud-tooltip hidden">Home</div>
-
-  </section>
-
-  <section id="professional" class="profile-section" aria-labelledby="professional-title">
-      <div class="placeholder-content">
-        <h2 id="professional-title">Professional Portfolio</h2>
-        <p>Comming Soon .....</p>
+      <div id="help-icon" class="hidden" aria-label="Help">
+        <span>?</span>
       </div>
-    </section>
-
-    <section id="social" class="profile-section" aria-labelledby="social-title">
-      <div class="placeholder-content">
-        <h2 id="social-title">Let's Connect</h2>
-        <p>Links to GitHub, LinkedIn, and ways to get in touch. <br> (Comming soon .....)</p>
+      <dialog id="instruction-modal" class="modern-dialog" aria-labelledby="modal-text">
+        <div class="dialog-content">
+          <button id="close-btn" class="close-circle" aria-label="Close instructions">&times;</button>
+          <p id="modal-text">"Simply press on spin or manually click on the sector you're interested in and let the magic happen!"</p>
+        </div>
+      </dialog>
+        
+      <div class="content-overlay" id="contentOverlay">
+        <div class="content-box" id="contentBox">
+          <div class="content-title" id="contentTitle"></div>
+          <div class="content-desc" id="contentDesc"></div>
+        </div>
       </div>
+      <button class="home-btn" id="homeBtn" title="Back to Home"><i class="fa fa-home" style="font-size:24px"></i></button>
+      <div id="tooltip-content" class="cloud-tooltip hidden">Home</div>
+  
     </section>
-
+  
+    <section id="professional" class="profile-section" aria-labelledby="professional-title">
+        <div class="placeholder-content">
+          <h2 id="professional-title">Professional Portfolio</h2>
+          <p>Comming Soon .....</p>
+        </div>
+      </section>
+  
+      <section id="social" class="profile-section" aria-labelledby="social-title">
+        <div class="placeholder-content">
+          <h2 id="social-title">Let's Connect</h2>
+          <p>Links to GitHub, LinkedIn, and ways to get in touch. <br> (Comming soon .....)</p>
+        </div>
+      </section>
   </main>
 
-  
   <div class="dialogue-box">
     <p style="display: flex; justify-content: center; font-weight: 700;"><span id="yearftr"></span>pslkk.space</p>
   </div>
@@ -1263,7 +1279,7 @@
 
         // New Start
         helloMsg.style.color = "white";
-        document.body.style.background = "black";
+        document.getElementById("hobbyist").style.background = "black";
         createSceneDots(winningSectorColor);
         // New End
         
