@@ -795,6 +795,144 @@
     .placeholder-content h2 { margin-bottom: 16px; color: var(--text-dark); }
     .placeholder-content p { color: var(--text-light); line-height: 1.6; }
 
+    /* Drawer */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 998;
+    }
+    
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    
+    .drawer-container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 340px;
+      height: 100vh;
+      background-color: #ffffff;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      transform: translateX(100%);
+      will-change: transform;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 999;
+    }
+    
+    .drawer-container.open {
+      transform: translateX(0);
+    }
+    
+    .drawer-toggle {
+      position: absolute;
+      left: -32px;
+      top: 50%;
+      width: 32px;
+      height: 100px;
+      background-color: #10b981;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.4s ease;
+    }
+
+    @keyframes attentionPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+    
+    .drawer-toggle.pulse {
+      animation: attentionPulse 2s infinite;
+    }
+    
+    .drawer-toggle.idle.pulse {
+      animation: none; 
+    }
+
+    .drawer-toggle.idle {
+      opacity: 0.3; 
+    }
+    
+    .drawer-toggle:hover {
+      opacity: 1;
+    }
+    
+    .drawer-container.open .drawer-toggle {
+      background-color: #ef4444;
+      animation: none;
+    }
+    
+    .arrow-icon {
+      width: 20px;
+      height: 20px;
+      color: white;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .drawer-container.open .arrow-icon {
+      transform: rotate(180deg);
+    }
+    
+    .drawer-content {
+      padding: 32px 24px;
+      height: 100%;
+      overflow-y: auto;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .drawer-content h2 {
+      font-size: 1.5rem;
+      color: #111827;
+      border-bottom: 2px solid #f3f4f6;
+      padding-bottom: 16px;
+      margin: 0 0 24px 0;
+    }
+    
+    .news-item {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .news-source {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #10b981;
+      font-weight: 700;
+    }
+    
+    .news-link {
+      color: #374151;
+      text-decoration: none;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    
+    .news-link:hover {
+      color: #10b981;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, ::before, ::after {
         animation-duration: 0.01ms !important;
@@ -929,6 +1067,21 @@
       </a>
     </div>
   </nav>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer-container" id="drawerContainer">
+    <div class="drawer-toggle" id="drawerToggle" aria-label="Toggle News Drawer">
+      <svg class="arrow-icon" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+      </svg>
+    </div>
+    <div class="drawer-content">
+      <h2>What's New!</h2>
+      <div id="newsFeedContainer">
+        <p style="color: #9ca3af; font-size: 0.9rem;">Loading latest updates...</p>
+      </div>
+    </div>
+  </div>
 
   <main class="content-container">
     <section id="hobbyist" class="profile-section is-active" aria-labelledby="hobbyist-title">
@@ -1645,6 +1798,88 @@
             });
           
             resetActivity();
+
+            const drawerContainer = document.getElementById('drawerContainer');
+            const drawerToggle = document.getElementById('drawerToggle');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            const newsFeedContainer = document.getElementById('newsFeedContainer');
+            
+            let newsLoaded = false;
+            let idleTimer; 
+            let hasInteracted = false;
+          
+            drawerToggle.classList.add('pulse');
+          
+            function resetIdleTimer() {
+              drawerToggle.classList.remove('idle');
+              clearTimeout(idleTimer);
+              
+              idleTimer = setTimeout(() => {
+                drawerToggle.classList.add('idle');
+                drawerToggle.classList.remove('pulse'); 
+              }, 4000);
+            }
+          
+            function toggleDrawer() {
+              if (!hasInteracted) {
+                drawerToggle.classList.remove('pulse');
+                hasInteracted = true;
+              }
+          
+              const isOpen = drawerContainer.classList.toggle('open');
+              drawerOverlay.classList.toggle('active');
+              
+              resetIdleTimer();
+              
+              if (isOpen && !newsLoaded) {
+                fetchCustomNews();
+              }
+            }
+          
+            async function fetchCustomNews() {
+              try {
+                const response = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const updates = await response.json();
+                
+                newsFeedContainer.replaceChildren(); 
+                updates.forEach(update => {
+                  const itemDiv = document.createElement('div');
+                  itemDiv.className = 'news-item';
+                  
+                  const categorySpan = document.createElement('span');
+                  categorySpan.className = 'news-source';
+                  categorySpan.textContent = update.category;
+                  
+                  const textElement = update.link ? document.createElement('a') : document.createElement('span');
+                  textElement.className = 'news-link';
+                  textElement.textContent = update.text;
+                  
+                  if (update.link) {
+                    textElement.href = update.link;
+                    textElement.target = '_blank';
+                    textElement.rel = 'noopener noreferrer';
+                  } else {
+                    textElement.style.pointerEvents = 'none'; 
+                    textElement.style.color = '#374151';
+                  }
+                  
+                  itemDiv.appendChild(categorySpan);
+                  itemDiv.appendChild(textElement);
+                  newsFeedContainer.appendChild(itemDiv);
+                });
+                newsLoaded = true;
+              } catch (error) {
+                console.error('Failed to load custom updates:', error);
+                newsFeedContainer.textContent = 'Unable to load updates at this time.';
+              }
+            }
+          
+            drawerToggle.addEventListener('click', toggleDrawer);
+            drawerOverlay.addEventListener('click', toggleDrawer);
+            drawerToggle.addEventListener('mouseenter', resetIdleTimer);
+          
+            resetIdleTimer(); 
 
         const currentYearftr = new Date().getFullYear();
         document.getElementById('yearftr').innerHTML = currentYearftr + " &copy;" + "&nbsp;";
