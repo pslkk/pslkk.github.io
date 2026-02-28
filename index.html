@@ -839,7 +839,7 @@
       top: 15%;
       width: 27px;
       height: 100px;
-      border-radius: 20%;
+      border-radius: 30%;
       background-color: #10b981;
       cursor: pointer;
       display: flex;
@@ -870,7 +870,7 @@
     }
 
     .drawer-toggle.idle {
-      opacity: 0.3; 
+      opacity: 0.4; 
     }
     
     .drawer-toggle:hover {
@@ -1807,7 +1807,8 @@
             const newsFeedContainer = document.getElementById('newsFeedContainer');
             
             let newsLoaded = false;
-            let idle_Timer2; 
+            let idle_Timer2;
+            let pulse_Timer;
             let hasInteracted = false;
           
             drawerToggle.classList.add('pulse');
@@ -1815,10 +1816,16 @@
             function resetIdleTimer() {
               drawerToggle.classList.remove('idle');
               clearTimeout(idle_Timer2);
+              clearTimeout(pulse_Timer);
+
+              if (hasInteracted && !drawerContainer.classList.contains('open')) {
+                pulse_Timer = setTimeout(() => {
+                  drawerToggle.classList.add('pulse');
+                }, 3000);
+              }
               
               idle_Timer2 = setTimeout(() => {
-                drawerToggle.classList.add('idle');
-                drawerToggle.classList.remove('pulse'); 
+                drawerToggle.classList.add('idle'); 
               }, 4000);
             }
           
