@@ -1805,7 +1805,7 @@
             const newsFeedContainer = document.getElementById('newsFeedContainer');
             
             let newsLoaded = false;
-            let idleTimer; 
+            let idle_Timer2; 
             let hasInteracted = false;
           
             drawerToggle.classList.add('pulse');
@@ -1814,7 +1814,7 @@
               drawerToggle.classList.remove('idle');
               clearTimeout(idleTimer);
               
-              idleTimer = setTimeout(() => {
+              idle_Timer2 = setTimeout(() => {
                 drawerToggle.classList.add('idle');
                 drawerToggle.classList.remove('pulse'); 
               }, 4000);
