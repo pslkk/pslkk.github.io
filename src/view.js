@@ -48,62 +48,80 @@ export default {
     try {
       const path = url.searchParams.get("path") || "/";
 
-      // GET Stats
-      if (request.method === "GET") {
-        const views = await env.KV_STATS.get(`views::${path}`);
-        const unique = await env.KV_STATS.get(`unique::${path}`);
-        return Response.json({ 
-          views: parseInt(views || 0), 
-          unique: parseInt(unique || 0) 
-        }, { headers: corsHeaders });
+       if (path === "whatsnew") {
+        try {
+          const customNews = await env.NEWS_KV.get("site_updates");
+          if (customNews) {
+            return new Response(customNews, { 
+              headers: { ...corsHeaders, "Content-Type": "application/json" } 
+            });
+          }
+          return new Response(JSON.stringify([{ category: "System", text: "No recent updates.", link: "" }]), { 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          });
+        } catch (err) {
+          return new Response(JSON.stringify({ error: "Feed unavailable" }), { status: 500, headers: corsHeaders });
+        }
       }
 
-      // POST Increment
-      if (request.method === "POST") {
-        const ipKey = `ip::${path}::${clientIP}`;
-        const [currentViewsStr, currentUniqueStr, hasVisited] = await Promise.all([
-          env.KV_STATS.get(`views::${path}`),
-          env.KV_STATS.get(`unique::${path}`),
-          env.KV_STATS.get(ipKey)
-        ]);
-
-        let newViews = parseInt(currentViewsStr || 0) + 1;
-        let newUnique = parseInt(currentUniqueStr || 0);
-
-        if (!hasVisited) {
-          newUnique += 1;
+      if (path) {
+        // GET Stats
+        if (request.method === "GET") {
+          const views = await env.KV_STATS.get(`views::${path}`);
+          const unique = await env.KV_STATS.get(`unique::${path}`);
+          return Response.json({ 
+            views: parseInt(views || 0), 
+            unique: parseInt(unique || 0) 
+          }, { headers: corsHeaders });
         }
-
-        // Background Update (High Performance)
-        ctx.waitUntil((async () => {
-          await env.KV_STATS.put(`views::${path}`, newViews.toString());
+  
+        // POST Increment
+        if (request.method === "POST") {
+          const ipKey = `ip::${path}::${clientIP}`;
+          const [currentViewsStr, currentUniqueStr, hasVisited] = await Promise.all([
+            env.KV_STATS.get(`views::${path}`),
+            env.KV_STATS.get(`unique::${path}`),
+            env.KV_STATS.get(ipKey)
+          ]);
+  
+          let newViews = parseInt(currentViewsStr || 0) + 1;
+          let newUnique = parseInt(currentUniqueStr || 0);
+  
           if (!hasVisited) {
-            await env.KV_STATS.put(`unique::${path}`, newUnique.toString());
-            await env.KV_STATS.put(ipKey, "1", { expirationTtl: 86400 });
+            newUnique += 1;
           }
-        })());
-
-        return Response.json({ 
-          views: newViews, 
-          unique: newUnique 
-        }, { headers: corsHeaders });
-
-        // -- OLD Version --
-        /*const hasVisited = await env.KV_STATS.get(ipKey);
-
-        // Background Update (High Performance)
-        ctx.waitUntil((async () => {
-          let currentViews = await env.KV_STATS.get(`views::${path}`);
-          await env.KV_STATS.put(`views::${path}`, (parseInt(currentViews || 0) + 1).toString());
-
-          if (!hasVisited) {
-            let currentUnique = await env.KV_STATS.get(`unique::${path}`);
-            await env.KV_STATS.put(`unique::${path}`, (parseInt(currentUnique || 0) + 1).toString());
-            await env.KV_STATS.put(ipKey, "1", { expirationTtl: 86400 });
-          }
-        })());
-
-        return new Response(JSON.stringify({ status: "ok" }), { headers: corsHeaders });*/
+  
+          // Background Update (High Performance)
+          ctx.waitUntil((async () => {
+            await env.KV_STATS.put(`views::${path}`, newViews.toString());
+            if (!hasVisited) {
+              await env.KV_STATS.put(`unique::${path}`, newUnique.toString());
+              await env.KV_STATS.put(ipKey, "1", { expirationTtl: 86400 });
+            }
+          })());
+  
+          return Response.json({ 
+            views: newViews, 
+            unique: newUnique 
+          }, { headers: corsHeaders });
+  
+          // -- OLD Version --
+          /*const hasVisited = await env.KV_STATS.get(ipKey);
+  
+          // Background Update (High Performance)
+          ctx.waitUntil((async () => {
+            let currentViews = await env.KV_STATS.get(`views::${path}`);
+            await env.KV_STATS.put(`views::${path}`, (parseInt(currentViews || 0) + 1).toString());
+  
+            if (!hasVisited) {
+              let currentUnique = await env.KV_STATS.get(`unique::${path}`);
+              await env.KV_STATS.put(`unique::${path}`, (parseInt(currentUnique || 0) + 1).toString());
+              await env.KV_STATS.put(ipKey, "1", { expirationTtl: 86400 });
+            }
+          })());
+  
+          return new Response(JSON.stringify({ status: "ok" }), { headers: corsHeaders });*/
+        }
       }
       return new Response("Method not allowed", { status: 405, headers: corsHeaders });
     } catch (err) {
