@@ -1821,6 +1821,7 @@
               if (hasInteracted && !drawerContainer.classList.contains('open')) {
                 pulse_Timer = setTimeout(() => {
                   drawerToggle.classList.add('pulse');
+                  hasInteracted = false;
                 }, 3000);
               }
               
