@@ -1847,7 +1847,7 @@
           
             async function fetchCustomNews() {
               try {
-                const response = await fetch(`${API_URL}?path=${encodeURIComponent(path)}`);
+                const response = await fetch(`${API_URL}?path=${encodeURIComponent("whatsnew")}`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const updates = await response.json();
                 
