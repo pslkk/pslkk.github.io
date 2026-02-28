@@ -5,3 +5,7 @@ compatibility_date = "2024-04-01"
 [[kv_namespaces]]
 binding = "KV_STATS"
 id = "9576e4f8f046435baf5eb8923c97f688"
+
+[[kv_namespaces]]
+binding = "NEWS_KV"
+id = "ab893297896c4c5ea6fc1213d0164d05"
