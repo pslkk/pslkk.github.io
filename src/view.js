@@ -48,21 +48,35 @@ export default {
     try {
       const path = url.searchParams.get("path") || "/";
 
-       if (path === "whatsnew") {
-        try {
-          const customNews = await env.NEWS_KV.get("site_updates");
-          if (customNews) {
-            return new Response(customNews, { 
+       if (path === "whatsnew" || "news_updates") {
+          try {
+            let kvKey = null;
+            if (path === 'whatsnew') kvKey = 'site_updates';
+            if (path === 'news_updates') kvKey = 'news_updates';
+    
+            if (kvKey) {
+              const customNews = await env.NEWS_KV.get(kvKey);
+              return new Response(customNews || "[]", {
+                status: 200,
+                headers: { ...corsHeaders, "Content-Type": "application/json" }
+              });
+            }
+            
+            return new Response("Invalid path parameter.", { status: 400, headers: corsHeaders });
+            
+            /*const customNews = await env.NEWS_KV.get("site_updates");
+            if (customNews) {
+              return new Response(customNews, { 
+                headers: { ...corsHeaders, "Content-Type": "application/json" } 
+              });
+            }
+            return new Response(JSON.stringify([{ category: "System", text: "No recent updates.", link: "" }]), { 
               headers: { ...corsHeaders, "Content-Type": "application/json" } 
-            });
+            });*/
+          } catch (err) {
+            return new Response(JSON.stringify({ error: "Feed unavailable" }), { status: 500, headers: corsHeaders });
           }
-          return new Response(JSON.stringify([{ category: "System", text: "No recent updates.", link: "" }]), { 
-            headers: { ...corsHeaders, "Content-Type": "application/json" } 
-          });
-        } catch (err) {
-          return new Response(JSON.stringify({ error: "Feed unavailable" }), { status: 500, headers: corsHeaders });
-        }
-      }
+       }
 
       if (path) {
         // GET Stats
@@ -127,5 +141,9 @@ export default {
     } catch (err) {
       return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
     }
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(fetchAndStoreNews(env));
   }
 };
