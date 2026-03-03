@@ -907,6 +907,37 @@
       padding-bottom: 16px;
       margin: 0 0 24px 0;
     }
+
+    .drawer-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 10px;
+    }
+    
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    
+    .tab-btn:hover {
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+    
+    .tab-btn.active {
+      font-weight: 600;
+      color: #111827;
+      background-color: #e5e7eb; /* Highlight active tab */
+    }
     
     .news-item {
       margin-bottom: 24px;
@@ -922,7 +953,13 @@
       color: #10b981;
       font-weight: 700;
     }
-    
+
+    .news-time {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      font-family: monospace;
+    }
+
     .news-link {
       color: #374151;
       text-decoration: none;
@@ -1080,6 +1117,10 @@
     </div>
     <div class="drawer-content">
       <h2>What's New!</h2>
+      <div class="drawer-tabs">
+        <button id="tab-system" class="tab-btn active" data-target="system">System</button>
+        <button id="tab-news" class="tab-btn" data-target="news">Live News</button>
+      </div>
       <div id="newsFeedContainer">
         <p style="color: #9ca3af; font-size: 0.9rem;">Loading latest updates...</p>
       </div>
@@ -1805,6 +1846,7 @@
             const drawerToggle = document.getElementById('drawerToggle');
             const drawerOverlay = document.getElementById('drawerOverlay');
             const newsFeedContainer = document.getElementById('newsFeedContainer');
+            const tabButtons = document.querySelectorAll('.tab-btn');
             
             let newsLoaded = false;
             let idle_Timer2;
@@ -1842,20 +1884,47 @@
               resetIdleTimer();
               
               if (isOpen && !newsLoaded) {
-                fetchCustomNews();
+                fetchCustomNews('system');
               }
             }
           
-            async function fetchCustomNews() {
+            async function fetchCustomNews(tabType = 'system') {
               try {
-                const response = await fetch(`${API_URL}?path=${encodeURIComponent("whatsnew")}`);
+                const apiPath = tabType === 'system' ? 'whatsnew' : 'news_updates';
+                const response = await fetch(`${API_URL}?path=${encodeURIComponent(apiPath)}`);
+                //const response = await fetch(`${API_URL}?path=${encodeURIComponent("whatsnew")}`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const updates = await response.json();
                 
-                newsFeedContainer.replaceChildren(); 
+                newsFeedContainer.replaceChildren();
+                
+                if (!Array.isArray(updates) || updates.length === 0) {
+                  const emptyMsg = document.createElement('div');
+                  emptyMsg.style.color = '#6b7280';
+                  emptyMsg.style.fontSize = '0.9rem';
+                  emptyMsg.textContent = tabType === 'system' ? 'No recent system updates.' : 'No live news available right now.';
+                  newsFeedContainer.appendChild(emptyMsg);
+                  return;
+                }
+                
                 updates.forEach(update => {
                   const itemDiv = document.createElement('div');
                   itemDiv.className = 'news-item';
+
+                  if (update.time) {
+                    const timeElement = document.createElement('div');
+                    timeElement.className = 'news-time';
+                    
+                    try {
+                      const dateObj = new Date(update.time);
+                      timeElement.textContent = dateObj.toLocaleString(undefined, { 
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                      });
+                    } catch (e) {
+                      timeElement.textContent = update.time;
+                    }
+                    itemDiv.appendChild(timeElement);
+                  }
                   
                   const categorySpan = document.createElement('span');
                   categorySpan.className = 'news-source';
@@ -1889,7 +1958,17 @@
             drawerOverlay.addEventListener('click', toggleDrawer);
             drawerToggle.addEventListener('mouseenter', resetIdleTimer);
           
-            resetIdleTimer(); 
+            resetIdleTimer();
+
+            tabButtons.forEach(button => {
+              button.addEventListener('click', (e) => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                const clickedBtn = e.target;
+                clickedBtn.classList.add('active');
+                const targetType = clickedBtn.getAttribute('data-target');
+                fetchCustomNews(targetType);
+              });
+            });
 
         const currentYearftr = new Date().getFullYear();
         document.getElementById('yearftr').innerHTML = currentYearftr + " &copy;" + "&nbsp;";
