@@ -10,8 +10,6 @@ export default {
       "https://pslkk.space"
     ];
     
-    //const origin = request.headers.get("Origin");
-
     const rawOrigin = request.headers.get("Origin") || request.headers.get("Referer") || "";
     let origin = "";
     try {
