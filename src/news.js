@@ -8,12 +8,12 @@ export async function fetchAndStoreNews(env) {
   const baseUrl = "https://newsdata.io/api/1/latest";
   const queryParams = new URLSearchParams({
     apikey: apiKey,
-    q="ai, quantum,quantum technologies AND quantum computing,computers",
-    language="en",
-    category="breaking,technology,science",
-    timezone="asia/kolkata",
-    prioritydomain="top",
-    removeduplicate="1"
+    q: "ai, quantum,quantum technologies AND quantum computing,computers",
+    language: "en",
+    category: "breaking,technology,science",
+    timezone: "asia/kolkata",
+    prioritydomain: "top",
+    removeduplicate: "1"
   });
 
   const apiCallUrl = `${baseUrl}?${queryParams.toString()}`;
@@ -33,7 +33,6 @@ export async function fetchAndStoreNews(env) {
     }
 
     const newUpdates = [];
-    const categories = ['Top Story', 'Tech Radar', 'Global Pulse'];
 
     for (let i = 0; i < Math.min(data.results.length, 10); i++) {
       const article = data.results[i];
