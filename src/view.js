@@ -47,21 +47,32 @@ export default {
     try {
       const path = url.searchParams.get("path") || "/";
 
-       if (path === "whatsnew" || "news_updates") {
-          try {
-            let kvKey = null;
-            if (path === 'whatsnew') kvKey = 'site_updates';
-            if (path === 'news_updates') kvKey = 'news_updates';
+      if (request.method === "POST" && url.pathname === '/update-news') {
+        const providedSecret = request.headers.get('x-update-secret');
+        if (providedSecret !== env.UPDATE_SECRET) {
+          return new Response(JSON.stringify({ error: "Unauthorized" }), { 
+            status: 401, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          });
+        }
+        return await fetchAndStoreNews(env);
+      }
+
+      if  (request.method === "GET" && (path === "whatsnew" || path === "news_updates")) {
+        try {
+          let kvKey = null;
+          if (path === 'whatsnew') kvKey = 'site_updates';
+          if (path === 'news_updates') kvKey = 'news_updates';
     
-            if (kvKey) {
-              const customNews = await env.NEWS_KV.get(kvKey);
-              return new Response(customNews || "[]", {
-                status: 200,
-                headers: { ...corsHeaders, "Content-Type": "application/json" }
-              });
-            }
+          if (kvKey) {
+            const customNews = await env.NEWS_KV.get(kvKey);
+            return new Response(customNews || "[]", {
+              status: 200,
+              headers: { ...corsHeaders, "Content-Type": "application/json" }
+            });
+          }
             
-            return new Response("Invalid path parameter.", { status: 400, headers: corsHeaders });
+          return new Response("Invalid path parameter.", { status: 400, headers: corsHeaders });
             
             /*const customNews = await env.NEWS_KV.get("site_updates");
             if (customNews) {
@@ -72,12 +83,12 @@ export default {
             return new Response(JSON.stringify([{ category: "System", text: "No recent updates.", link: "" }]), { 
               headers: { ...corsHeaders, "Content-Type": "application/json" } 
             });*/
-          } catch (err) {
-            return new Response(JSON.stringify({ error: "Feed unavailable" }), { status: 500, headers: corsHeaders });
-          }
-       }
+        } catch (err) {
+          return new Response(JSON.stringify({ error: "Feed unavailable" }), { status: 500, headers: corsHeaders });
+        }
+      }
 
-      if (path) {
+      if (path && path !== "whatsnew" && path !== "news_updates") {
         // GET Stats
         if (request.method === "GET") {
           const views = await env.KV_STATS.get(`views::${path}`);
