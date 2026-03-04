@@ -8,7 +8,7 @@ export async function fetchAndStoreNews(env) {
   const baseUrl = "https://newsdata.io/api/1/latest";
   const queryParams = new URLSearchParams({
     apikey: apiKey,
-    q: "ai, quantum,quantum technologies AND quantum computing,computers",
+    q: "ai OR quantum computing OR cyber security OR quantum",
     language: "en",
     category: "breaking,technology,science",
     timezone: "asia/kolkata",
