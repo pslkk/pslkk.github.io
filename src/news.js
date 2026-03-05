@@ -49,7 +49,7 @@ export async function fetchAndStoreNews(env) {
           text: article.title || "No title available",
           link: safeLink
         };
-      });
+      }).reverse();
 
       await env.NEWS_KV.put(`news_updates:${queryObj.id}`, JSON.stringify(newUpdates));
     });
