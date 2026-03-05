@@ -11,4 +11,8 @@ binding = "NEWS_KV"
 id = "ab893297896c4c5ea6fc1213d0164d05"
 
 [triggers]
-crons = ["0 */12 * * *"] 
+crons = [
+  "0 0,12 * * *",
+  "2 4,16 * * *",
+  "4 8,20 * * *"
+]
