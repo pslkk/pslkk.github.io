@@ -1,4 +1,4 @@
-import { fetchAndStoreNews } from './news.js';
+import { fetchAndStoreNews, rotateNewsFeed } from './news.js';
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -56,6 +56,17 @@ export default {
           });
         }
         return await fetchAndStoreNews(env);
+      }
+
+       if (request.method === "POST" && url.pathname === '/rotate-news') {
+        if (request.headers.get('x-update-secret') !== env.UPDATE_SECRET) {
+          return new Response(JSON.stringify({ error: "Unauthorized" }), { 
+            status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          });
+        }
+        
+        const res = await rotateNewsFeed(env);
+        return new Response(res.body, { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
       if  (request.method === "GET" && (path === "whatsnew" || path === "news_updates")) {
@@ -153,7 +164,24 @@ export default {
     }
   },
 
-  async scheduled(event, env, ctx) {
+  /*async scheduled(event, env, ctx) {
     ctx.waitUntil(fetchAndStoreNews(env));
+  }*/
+
+  async scheduled(event, env, ctx) {
+    switch (event.cron) {
+      case "0 0,12 * * *":
+        ctx.waitUntil(fetchAndStoreNews(env));
+        break;
+      
+      case "2 4,16 * * *":
+      case "4 8,20 * * *":
+        ctx.waitUntil(rotateNewsFeed(env));
+        break;
+        
+      default:
+        console.log(`Fallback triggered for unknown cron: ${event.cron}`);
+        ctx.waitUntil(rotateNewsFeed(env));
+    }
   }
 };
